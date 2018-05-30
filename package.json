@@ -1,0 +1,22 @@
+{
+  "name": "KSP Profile Manager",
+  "version": "1.0.0",
+  "description": "testbed for scouting software",
+  "main": "main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "keywords": [
+    "test"
+  ],
+  "author": "Aree Vanier",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^2.0.2"
+  }
+  
+  "repository" : {
+	  "type" : "git",
+	  "url" : "https://github.com/Aree-Vanier/KSP-Profile-Manager"
+  }
+}
