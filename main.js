@@ -1,5 +1,7 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 
+var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
+
 var window;
 
 app.on('ready', function(){
@@ -11,13 +13,10 @@ app.on("browser-window-created",function(e,window) {
 	window.toggleDevTools();
 });
 
-
-
-
+/*IPC window functions*/{
 ipcMain.on('window-min', function (){
    window.minimize(); 
 });
-
 
 ipcMain.on('window-max', function (){
    if (!window.isMaximized()) {
@@ -30,4 +29,20 @@ ipcMain.on('window-max', function (){
 ipcMain.on('window-close', function(){
    console.log("close");
    window.close();
+});
+}
+
+ipcMain.on("window-launch", function(){
+	console.log("launch");
+	var execFile = require('child_process').execFile, child;
+         child = execFile(path, function(error,stdout,stderr) { 
+            if (error) {
+              //console.log(error.stack); 
+              //console.log('Error code: '+ error.code); 
+              //console.log('Signal received: '+ 
+              //       error.signal);
+              }
+              //console.log('Child Process stdout: '+ stdout);
+              //console.log('Child Process stderr: '+ stderr);
+          }); 
 });

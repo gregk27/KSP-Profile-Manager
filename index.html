@@ -5,25 +5,47 @@
 
 	console.log("INIT");
 	
-	function closeWin(){
+	function win_close(){
 		ipcRenderer.send('window-close');
 	}
-	function max() {
+	function win_max() {
 		ipcRenderer.send('window-max');
 	}
-	function min() {
+	function win_min() {
 		ipcRenderer.send('window-min');
 	}
+	function win_launch(){
+		ipcRenderer.send("window-launch");
+		setOverlay(true);
+	}
+	
+	function setOverlay(state) {
+		if(state)
+			document.getElementById("launchOverlay").style.display = "block";
+		else
+			document.getElementById("launchOverlay").style.display = "none";
+	}
+	
 </script>
 
 <body>
 	<header>
-		<a class="close" id="close" onclick="closeWin()">&times;</a>
-		<a class="close" id="max" onclick="max()">&square;</a>
-		<a class="close" id="min" onclick="min()">&#95;</a>
+		<a class="close" id="close" onclick="win_close()">&times;</a>
+		<a class="close" id="max" onclick="win_max()">&square;</a>
+		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
 	
+	<div class="overlay" id="launchOverlay">
+		<content>
+		Game Launched
+		<br/><br/><br/><br/>
+		<a onclick="setOverlay(false)">Dismiss</a>
+		</content>
+	</div>
+	
+	
+	
 	<footer>
-	<a class="launch"><span>Launch!</span><img src="launch.svg"/></a>
+		<a class="launch" onclick="win_launch()"><span>Launch!</span><img src="launch.svg"/></a>
 	</footer>
 </body>
