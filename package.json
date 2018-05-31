@@ -1,5 +1,5 @@
 {
-  "name": "KSP Profile Manager",
+  "name": "profile-manager",
   "version": "1.0.0",
   "description": "testbed for scouting software",
   "main": "main.js",
@@ -14,9 +14,5 @@
   "dependencies": {
     "electron": "^2.0.2"
   }
-  
-  "repository" : {
-	  "type" : "git",
-	  "url" : "https://github.com/Aree-Vanier/KSP-Profile-Manager"
-  }
+
 }

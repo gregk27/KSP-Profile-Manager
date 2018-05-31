@@ -1,3 +1,29 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<script>
+	const {ipcRenderer} = require('electron')
+
+	console.log("INIT");
+	
+	function closeWin(){
+		ipcRenderer.send('window-close');
+	}
+	function max() {
+		ipcRenderer.send('window-max');
+	}
+	function min() {
+		ipcRenderer.send('window-min');
+	}
+</script>
+
 <body>
-  Hello World!
+	<header>
+		<a class="close" id="close" onclick="closeWin()">&times;</a>
+		<a class="close" id="max" onclick="max()">&square;</a>
+		<a class="close" id="min" onclick="min()">&#95;</a>
+	</header>
+	
+	<footer>
+	<a class="launch">Launch!<image src=""/></a>
+	</footer>
 </body>
