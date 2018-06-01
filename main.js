@@ -1,5 +1,7 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 
+
+
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
 
 var window;
@@ -52,4 +54,9 @@ ipcMain.on("window-launch", function(){
 ipcMain.on("window-profiles", function(){
 	profileWindow = new BrowserWindow({width:320, height:240, frame: false});
 	window.loadFile('profiles.html');
+});
+
+ipcMain.on("set-path", function(event, arg){
+	path = arg;
+	console.log("Path set to: "+path);
 });

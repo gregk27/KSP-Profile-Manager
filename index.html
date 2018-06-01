@@ -33,9 +33,32 @@
     function profileOverlay(state) {
 		if(state)
 			document.getElementById("profileOverlay").style.display = "block";
-		else
+		else{
 			document.getElementById("profileOverlay").style.display = "none";
+			setPath();
+		}
 	}
+    
+    function steamMode(){
+        document.getElementById("ksp_path").disabled=true;
+        document.getElementById("exeVersion").style.display='inline';
+    }
+  
+    function manualMode(){
+      document.getElementById("ksp_path").disabled=false;
+      document.getElementById("exeVersion").style.display='none';
+    }
+	
+	function setPath(){
+		ipcRenderer.send("set-path", document.getElementById("ksp_path").value);
+	}
+  
+	function getPath(){
+	}
+  
+    function setExe(exe){
+        document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
+    }
 	
 </script>
 
@@ -59,19 +82,32 @@
           <content>
             <h1>Profiles</h1>
             <br/>
-              Installion mode:
+              Installion mode: 
               <label class="container">Steam
-                <input type="radio" name="radio" checked='true'>
+                <input type="radio" name="radio" checked='true' onchange="steamMode()">
                 <span class="checkmark"></span>
               </label>
               <label class="container">Manual
-                <input type="radio" name="radio">
+                <input type="radio" name="radio" onchange="manualMode()">
                 <span class="checkmark"></span>
               </label>
+			  
+			  <div id="exeVersion" style="display:inline">
+                <br/>
+				  Exe version: 
+				  <label class="container">64 bit
+					<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')">
+					<span class="checkmark"></span>
+				  </label>
+				  <label class="container">32 bit
+					<input type="radio" name="exeVersion" onchange="setExe('KSP')">
+					<span class="checkmark"></span>
+				  </label>
+			  </div>
               
               <p>
                 Path:
-                <input type="text" class="text" id="path" value="test" disabled></input>
+                <input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
               </p>
               
               <br/>
