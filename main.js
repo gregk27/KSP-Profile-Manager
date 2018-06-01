@@ -1,4 +1,5 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
+const fs = require("fs");
 
 var profile = {
 	"mode":"manual",
