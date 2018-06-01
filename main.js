@@ -2,11 +2,20 @@ const {app, BrowserWindow, ipcMain} = require("electron");
 const fs = require("fs");
 
 var profile = {
-	"mode":"manual",
+	"mode":"steam",
 	"version":"64",
-	"path":"C:\\Windows\\System32\\calc.exe"
-	};
+	"path":"C:\\Program Files\\KSP_x64"
+};
 
+//Load profile
+fs.readFile('profile.txt', 'utf-8' ,function(err, buf) {
+  profile=(JSON.parse(buf.toString()));
+  console.log(profile)
+});
+	
+	
+	
+	
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
 
 var window;
