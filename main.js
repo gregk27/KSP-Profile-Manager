@@ -4,6 +4,8 @@ var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Prog
 
 var window;
 
+var profileWindow;
+
 app.on('ready', function(){
 	window = new BrowserWindow({width:640, height:480, frame: false})
 	window.loadFile("index.html")
@@ -45,4 +47,9 @@ ipcMain.on("window-launch", function(){
               //console.log('Child Process stdout: '+ stdout);
               //console.log('Child Process stderr: '+ stderr);
           }); 
+});
+
+ipcMain.on("window-profiles", function(){
+	profileWindow = new BrowserWindow({width:320, height:240, frame: false});
+	window.loadFile('profiles.html');
 });

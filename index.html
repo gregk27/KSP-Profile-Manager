@@ -16,32 +16,68 @@
 	}
 	function win_launch(){
 		ipcRenderer.send("window-launch");
-		setOverlay(true);
+		launchOverlay(true);
 	}
 	
-	function setOverlay(state) {
+	function win_profiles(){
+		ipcRenderer.send("window-profiles");
+	}
+	
+	function launchOverlay(state) {
 		if(state)
 			document.getElementById("launchOverlay").style.display = "block";
 		else
 			document.getElementById("launchOverlay").style.display = "none";
+	}	
+   
+    function profileOverlay(state) {
+		if(state)
+			document.getElementById("profileOverlay").style.display = "block";
+		else
+			document.getElementById("profileOverlay").style.display = "none";
 	}
 	
 </script>
 
 <body>
 	<header>
+        <a class="menu" id="profiles" onclick="profileOverlay(true)">Profiles</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
 	
-	<div class="overlay" id="launchOverlay">
+	<div class="overlay" id="launchOverlay" >
 		<content>
-		Game Launched
+          <h1>Game Launched</h1>
 		<br/><br/><br/><br/>
-		<a onclick="setOverlay(false)">Dismiss</a>
+		<a onclick="launchOverlay(false)">Dismiss</a>
 		</content>
 	</div>
+  
+    <div class="overlay" id="profileOverlay">
+          <content>
+            <h1>Profiles</h1>
+            <br/>
+              Installion mode:
+              <label class="container">Steam
+                <input type="radio" name="radio" checked='true'>
+                <span class="checkmark"></span>
+              </label>
+              <label class="container">Manual
+                <input type="radio" name="radio">
+                <span class="checkmark"></span>
+              </label>
+              
+              <p>
+                Path:
+                <input type="text" class="text" id="path" value="test" disabled></input>
+              </p>
+              
+              <br/>
+              <a onclick="profileOverlay(false)">Confirm</a>
+          </content>
+      </div>  
 	
 	
 	
