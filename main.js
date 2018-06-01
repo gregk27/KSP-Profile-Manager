@@ -73,6 +73,10 @@ ipcMain.on("window-profiles", function(){
 ipcMain.on("set-profile", function(event, arg){
 	profile = arg;
 	console.log(profile);
+	fs.writeFile('profile.txt', JSON.stringify(profile), function(err, data){
+		if (err) console.log(err);
+			console.log("Successfully Written to File.");
+	});
 });
 
 ipcMain.on("request-profile", function(event){
