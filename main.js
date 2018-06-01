@@ -1,6 +1,10 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 
-
+var profile = {
+	"mode":"steam",
+	"version":"64",
+	"path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe"
+	};
 
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
 
@@ -56,7 +60,7 @@ ipcMain.on("window-profiles", function(){
 	window.loadFile('profiles.html');
 });
 
-ipcMain.on("set-path", function(event, arg){
-	path = arg;
-	console.log("Path set to: "+path);
+ipcMain.on("set-profile", function(event, arg){
+	profile = arg;
+	console.log(profile);
 });

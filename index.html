@@ -35,7 +35,7 @@
 			document.getElementById("profileOverlay").style.display = "block";
 		else{
 			document.getElementById("profileOverlay").style.display = "none";
-			setPath();
+			setProfile();
 		}
 	}
     
@@ -49,12 +49,38 @@
       document.getElementById("exeVersion").style.display='none';
     }
 	
-	function setPath(){
-		ipcRenderer.send("set-path", document.getElementById("ksp_path").value);
+	function setProfile(){
+		var mode = "";
+		var version = "";
+		
+		console.log(document.getElementById("installation_steam").checked);
+		
+		if(document.getElementById("installation_steam").checked)
+			mode="steam";
+		else
+			mode='manual';
+			
+		if(document.getElementById("version_64").checked)
+			version="64";
+		else
+			version="32";
+		
+	
+		var profile = {
+			"mode":mode,
+			"version":version,
+			"path":document.getElementById("ksp_path").value,
+		}
+		
+		
+	
+		ipcRenderer.send("set-profile", profile);
 	}
   
-	function getPath(){
+	function getProfile(){
 	}
+	
+
   
     function setExe(exe){
         document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
@@ -78,42 +104,43 @@
 		</content>
 	</div>
   
-    <div class="overlay" id="profileOverlay">
-          <content>
-            <h1>Profiles</h1>
-            <br/>
-              Installion mode: 
-              <label class="container">Steam
-                <input type="radio" name="radio" checked='true' onchange="steamMode()">
-                <span class="checkmark"></span>
-              </label>
-              <label class="container">Manual
-                <input type="radio" name="radio" onchange="manualMode()">
-                <span class="checkmark"></span>
-              </label>
-			  
-			  <div id="exeVersion" style="display:inline">
-                <br/>
-				  Exe version: 
-				  <label class="container">64 bit
-					<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')">
+	<div class="overlay" id="profileOverlay">
+		<content>
+			<h1>Profiles</h1>
+			<div id="installMode">
+				<br/>
+				Installion mode: 
+				<label class="container">Steam
+					<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
 					<span class="checkmark"></span>
-				  </label>
-				  <label class="container">32 bit
-					<input type="radio" name="exeVersion" onchange="setExe('KSP')">
+				</label>
+				<label class="container">Manual
+					<input type="radio" name="mode" onchange="manualMode()" id="installation_manual">
 					<span class="checkmark"></span>
-				  </label>
-			  </div>
-              
-              <p>
-                Path:
-                <input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
-              </p>
-              
-              <br/>
-              <a onclick="profileOverlay(false)">Confirm</a>
-          </content>
-      </div>  
+				</label>
+			</div>
+			<div id="exeVersion" style="display:inline">
+				<br/>
+				Exe version: 
+				<label class="container">64 bit
+					<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')" id="version_64">
+					<span class="checkmark"></span>
+				</label>
+				<label class="container">32 bit
+					<input type="radio" name="exeVersion" onchange="setExe('KSP')" id="version_32">
+					<span class="checkmark"></span>
+				</label>
+			</div>
+
+			<p>
+				Path:
+				<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
+			</p>
+
+			<br/>
+			<a onclick="profileOverlay(false)">Confirm</a>
+		</content>
+	</div>  
 	
 	
 	
