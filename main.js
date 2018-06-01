@@ -1,9 +1,9 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 
 var profile = {
-	"mode":"steam",
+	"mode":"manual",
 	"version":"64",
-	"path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe"
+	"path":"C:\\Windows\\System32\\calc.exe"
 	};
 
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
@@ -43,7 +43,7 @@ ipcMain.on('window-close', function(){
 ipcMain.on("window-launch", function(){
 	console.log("launch");
 	var execFile = require('child_process').execFile, child;
-         child = execFile(path, function(error,stdout,stderr) { 
+         child = execFile(profile["path"], function(error,stdout,stderr) { 
             if (error) {
               //console.log(error.stack); 
               //console.log('Error code: '+ error.code); 
@@ -64,3 +64,7 @@ ipcMain.on("set-profile", function(event, arg){
 	profile = arg;
 	console.log(profile);
 });
+
+ipcMain.on("request-profile", function(event){
+	event.sender.send("get-profile", profile);
+})

@@ -31,8 +31,10 @@
 	}	
    
     function profileOverlay(state) {
-		if(state)
+		if(state){
 			document.getElementById("profileOverlay").style.display = "block";
+			getProfile();
+		}
 		else{
 			document.getElementById("profileOverlay").style.display = "none";
 			setProfile();
@@ -78,9 +80,28 @@
 	}
   
 	function getProfile(){
+		ipcRenderer.send("request-profile");
 	}
 	
+	ipcRenderer.on("get-profile", function(event, arg) { 
+		console.log(arg); 
+		if(arg["mode"] == "steam"){
+			document.getElementById("installation_steam").checked = true;
+			steamMode();
+		}
+		else{
+			document.getElementById("installation_manual").checked = true;
+			manualMode();
+		}
+		
+		if(arg["version"] == "64")
+			document.getElementById("version_64").checked = true;
+		else
+			document.getElementById("version_32").checked = true;
+			
+		document.getElementById("ksp_path").value = arg["path"];
 
+	});
   
     function setExe(exe){
         document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
