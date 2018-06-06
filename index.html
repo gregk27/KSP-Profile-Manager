@@ -58,17 +58,19 @@ function setProfile(){
 	console.log(document.getElementById("installation_steam").checked);
 
 	if(document.getElementById("installation_steam").checked)
-	mode="steam";
+		mode="steam";
 	else
-	mode='manual';
+		mode='manual';
 
 	if(document.getElementById("version_64").checked)
-	version="64";
+		version="64";
 	else
-	version="32";
+		version="32";
 
+	var name=document.getElementById("profile_name").value;
 
 	var profile = {
+		"name":name,
 		"mode":mode,
 		"version":version,
 		"path":document.getElementById("ksp_path").value,
@@ -95,11 +97,13 @@ ipcRenderer.on("get-profile", function(event, arg) {
 	}
 
 	if(arg["version"] == "64")
-	document.getElementById("version_64").checked = true;
+		document.getElementById("version_64").checked = true;
 	else
-	document.getElementById("version_32").checked = true;
+		document.getElementById("version_32").checked = true;
 
 	document.getElementById("ksp_path").value = arg["path"];
+
+	document.getElementById("profile_name").value = arg["name"];
 
 });
 
@@ -111,7 +115,7 @@ function setExe(exe){
 
 <body>
 	<header>
-		<a class="menu" id="profiles" onclick="profileOverlay(true)">Profiles</a>
+		<a class="menu" id="profiles" onclick="profileOverlay(true)">Edit Profile</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
@@ -127,7 +131,8 @@ function setExe(exe){
 
 	<div class="overlay" id="profileOverlay">
 		<content>
-			<h1>Profiles</h1>
+			<!-- <h1>Profile</h1> -->
+			<input type="text" class="largeText" id="profile_name" value="NAME"></input>
 			<div id="installMode">
 				<br/>
 				Installion mode:
@@ -164,12 +169,54 @@ function setExe(exe){
 	</div>
 
 
-	<div class="profileName">[PROFILE_NAME]<!--<a>&#9660;</a>--></div>
+	<div class="profileName">[Name]<!--<a>&#9660;</a>--></div>
 	<section class="overview">
 		Version: 1.4.1<br/>
 		Mods: 100<br/>
 		Saves: 2<br/>
 	</section>
+
+	<div style="width:100%; height:100%">
+	<section class="panel" id="mods">
+		<h1>Mods</h1>
+		<ul>
+			<li>Item 1</li>
+			<li>Item 2</li>
+			<li>Item 3</li>
+			<li>Item 4</li>
+			<li>Item 5</li>
+			<li>Item 6</li>
+			<li>Item 1</li>
+			<li>Item 2</li>
+			<li>Item 3</li>
+			<li>Item 4</li>
+			<li>Item 5</li>
+			<li>Item 6</li>
+			<li>Item 1</li>
+			<li>Item 2</li>
+			<li>Item 3</li>
+			<li>Item 4</li>
+			<li>Item 5</li>
+			<li>Item 6</li>
+		</ul>
+	</section>
+
+	<section class="panel" id="saves">
+		<h1>Saves</h1>
+		<ul>
+			<li>My first savegame<br/><span>Career</span></li>
+			<li>Item 2</li>
+			<li>Item 3</li>
+			<li>Item 4</li>
+			<li>Item 5</li>
+			<li>Item 6</li>
+			<li>Item 1</li>
+			<li>Item 2</li>
+			<li>Item 3</li>
+			<li>Item 4</li>
+		</ul>
+	</section>
+	</div>
 
 	<footer>
 		<a class="launch" onclick="win_launch()"><span>Launch!</span><img src="launch.svg"/></a>

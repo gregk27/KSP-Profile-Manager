@@ -2,6 +2,7 @@ const {app, BrowserWindow, ipcMain} = require("electron");
 const fs = require("fs");
 
 var profile = {
+	"name":"Profile 1",
 	"mode":"steam",
 	"version":"64",
 	"path":"C:\\Program Files\\KSP_x64"

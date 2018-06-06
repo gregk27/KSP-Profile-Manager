@@ -1,1 +1,1 @@
-{"name":"profile","mode":"steam","path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe","version":"64"}
+{"mode":"steam","name":"Career","path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe","version":"64"}
