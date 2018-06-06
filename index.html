@@ -1,136 +1,136 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <script>
-	const {ipcRenderer} = require('electron')
+const {ipcRenderer} = require('electron')
 
-	console.log("INIT");
-	
-	function win_close(){
-		ipcRenderer.send('window-close');
-	}
-	function win_max() {
-		ipcRenderer.send('window-max');
-	}
-	function win_min() {
-		ipcRenderer.send('window-min');
-	}
-	function win_launch(){
-		ipcRenderer.send("window-launch");
-		launchOverlay(true);
-	}
-	
-	function win_profiles(){
-		ipcRenderer.send("window-profiles");
-	}
-	
-	function launchOverlay(state) {
-		if(state)
-			document.getElementById("launchOverlay").style.display = "block";
-		else
-			document.getElementById("launchOverlay").style.display = "none";
-	}	
-   
-    function profileOverlay(state) {
-		if(state){
-			document.getElementById("profileOverlay").style.display = "block";
-			getProfile();
-		}
-		else{
-			document.getElementById("profileOverlay").style.display = "none";
-			setProfile();
-		}
-	}
-    
-    function steamMode(){
-        document.getElementById("ksp_path").disabled=true;
-        document.getElementById("exeVersion").style.display='inline';
-    }
-  
-    function manualMode(){
-      document.getElementById("ksp_path").disabled=false;
-      document.getElementById("exeVersion").style.display='none';
-    }
-	
-	function setProfile(){
-		var mode = "";
-		var version = "";
-		
-		console.log(document.getElementById("installation_steam").checked);
-		
-		if(document.getElementById("installation_steam").checked)
-			mode="steam";
-		else
-			mode='manual';
-			
-		if(document.getElementById("version_64").checked)
-			version="64";
-		else
-			version="32";
-		
-	
-		var profile = {
-			"mode":mode,
-			"version":version,
-			"path":document.getElementById("ksp_path").value,
-		}
-		
-		
-	
-		ipcRenderer.send("set-profile", profile);
-	}
-  
-	function getProfile(){
-		ipcRenderer.send("request-profile");
-	}
-	
-	ipcRenderer.on("get-profile", function(event, arg) { 
-		console.log(arg); 
-		if(arg["mode"] == "steam"){
-			document.getElementById("installation_steam").checked = true;
-			steamMode();
-		}
-		else{
-			document.getElementById("installation_manual").checked = true;
-			manualMode();
-		}
-		
-		if(arg["version"] == "64")
-			document.getElementById("version_64").checked = true;
-		else
-			document.getElementById("version_32").checked = true;
-			
-		document.getElementById("ksp_path").value = arg["path"];
+console.log("INIT");
 
-	});
-  
-    function setExe(exe){
-        document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
-    }
-	
+function win_close(){
+	ipcRenderer.send('window-close');
+}
+function win_max() {
+	ipcRenderer.send('window-max');
+}
+function win_min() {
+	ipcRenderer.send('window-min');
+}
+function win_launch(){
+	ipcRenderer.send("window-launch");
+	launchOverlay(true);
+}
+
+function win_profiles(){
+	ipcRenderer.send("window-profiles");
+}
+
+function launchOverlay(state) {
+	if(state)
+	document.getElementById("launchOverlay").style.display = "block";
+	else
+	document.getElementById("launchOverlay").style.display = "none";
+}
+
+function profileOverlay(state) {
+	if(state){
+		document.getElementById("profileOverlay").style.display = "block";
+		getProfile();
+	}
+	else{
+		document.getElementById("profileOverlay").style.display = "none";
+		setProfile();
+	}
+}
+
+function steamMode(){
+	document.getElementById("ksp_path").disabled=true;
+	document.getElementById("exeVersion").style.display='inline';
+}
+
+function manualMode(){
+	document.getElementById("ksp_path").disabled=false;
+	document.getElementById("exeVersion").style.display='none';
+}
+
+function setProfile(){
+	var mode = "";
+	var version = "";
+
+	console.log(document.getElementById("installation_steam").checked);
+
+	if(document.getElementById("installation_steam").checked)
+	mode="steam";
+	else
+	mode='manual';
+
+	if(document.getElementById("version_64").checked)
+	version="64";
+	else
+	version="32";
+
+
+	var profile = {
+		"mode":mode,
+		"version":version,
+		"path":document.getElementById("ksp_path").value,
+	}
+
+
+
+	ipcRenderer.send("set-profile", profile);
+}
+
+function getProfile(){
+	ipcRenderer.send("request-profile");
+}
+
+ipcRenderer.on("get-profile", function(event, arg) {
+	console.log(arg);
+	if(arg["mode"] == "steam"){
+		document.getElementById("installation_steam").checked = true;
+		steamMode();
+	}
+	else{
+		document.getElementById("installation_manual").checked = true;
+		manualMode();
+	}
+
+	if(arg["version"] == "64")
+	document.getElementById("version_64").checked = true;
+	else
+	document.getElementById("version_32").checked = true;
+
+	document.getElementById("ksp_path").value = arg["path"];
+
+});
+
+function setExe(exe){
+	document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
+}
+
 </script>
 
 <body>
 	<header>
-        <a class="menu" id="profiles" onclick="profileOverlay(true)">Profiles</a>
+		<a class="menu" id="profiles" onclick="profileOverlay(true)">Profiles</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
-	
+
 	<div class="overlay" id="launchOverlay" >
 		<content>
-          <h1>Game Launched</h1>
-		<br/><br/><br/><br/>
-		<a onclick="launchOverlay(false)">Dismiss</a>
+			<h1>Game Launched</h1>
+			<br/><br/><br/><br/>
+			<a onclick="launchOverlay(false)">Dismiss</a>
 		</content>
 	</div>
-  
+
 	<div class="overlay" id="profileOverlay">
 		<content>
 			<h1>Profiles</h1>
 			<div id="installMode">
 				<br/>
-				Installion mode: 
+				Installion mode:
 				<label class="container">Steam
 					<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
 					<span class="checkmark"></span>
@@ -142,7 +142,7 @@
 			</div>
 			<div id="exeVersion" style="display:inline">
 				<br/>
-				Exe version: 
+				Exe version:
 				<label class="container">64 bit
 					<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')" id="version_64">
 					<span class="checkmark"></span>
@@ -161,10 +161,16 @@
 			<br/>
 			<a onclick="profileOverlay(false)">Confirm</a>
 		</content>
-	</div>  
-	
-	
-	
+	</div>
+
+
+	<div class="profileName">[PROFILE_NAME]<!--<a>&#9660;</a>--></div>
+	<section class="overview">
+		Version: 1.4.1<br/>
+		Mods: 100<br/>
+		Saves: 2<br/>
+	</section>
+
 	<footer>
 		<a class="launch" onclick="win_launch()"><span>Launch!</span><img src="launch.svg"/></a>
 	</footer>
