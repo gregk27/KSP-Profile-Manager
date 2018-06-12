@@ -19,8 +19,8 @@ function win_launch(){
 	launchOverlay(true);
 }
 
-function win_profiles(){
-	ipcRenderer.send("window-profiles");
+function win_config(){
+	ipcRenderer.send("window-config");
 }
 
 function launchOverlay(state) {
@@ -30,14 +30,14 @@ function launchOverlay(state) {
 	document.getElementById("launchOverlay").style.display = "none";
 }
 
-function profileOverlay(state) {
+function configOverlay(state) {
 	if(state){
-		document.getElementById("profileOverlay").style.display = "block";
-		getProfile();
+		document.getElementById("configOverlay").style.display = "block";
+		getconfig();
 	}
 	else{
-		document.getElementById("profileOverlay").style.display = "none";
-		setProfile();
+		document.getElementById("configOverlay").style.display = "none";
+		setconfig();
 	}
 }
 
@@ -51,7 +51,7 @@ function manualMode(){
 	document.getElementById("exeVersion").style.display='none';
 }
 
-function setProfile(){
+function setconfig(){
 	var mode = "";
 	var version = "";
 
@@ -67,9 +67,9 @@ function setProfile(){
 	else
 		version="32";
 
-	var name=document.getElementById("profile_name").value;
+	var name=document.getElementById("config_name").value;
 
-	var profile = {
+	var config = {
 		"name":name,
 		"mode":mode,
 		"version":version,
@@ -78,14 +78,14 @@ function setProfile(){
 
 
 
-	ipcRenderer.send("set-profile", profile);
+	ipcRenderer.send("set-config", config);
 }
 
-function getProfile(){
-	ipcRenderer.send("request-profile");
+function getconfig(){
+	ipcRenderer.send("request-config");
 }
 
-ipcRenderer.on("get-profile", function(event, arg) {
+ipcRenderer.on("get-config", function(event, arg) {
 	console.log(arg);
 	if(arg["mode"] == "steam"){
 		document.getElementById("installation_steam").checked = true;
@@ -103,7 +103,7 @@ ipcRenderer.on("get-profile", function(event, arg) {
 
 	document.getElementById("ksp_path").value = arg["path"];
 
-	document.getElementById("profile_name").value = arg["name"];
+	document.getElementById("config_name").value = arg["name"];
 
 });
 
@@ -115,7 +115,7 @@ function setExe(exe){
 
 <body>
 	<header>
-		<a class="menu" id="profiles" onclick="profileOverlay(true)">Edit Profile</a>
+		<a class="menu" id="config" onclick="configOverlay(true)">Edit config</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
@@ -129,10 +129,10 @@ function setExe(exe){
 		</content>
 	</div>
 
-	<div class="overlay" id="profileOverlay">
+	<div class="overlay" id="configOverlay">
 		<content>
-			<!-- <h1>Profile</h1> -->
-			<input type="text" class="largeText" id="profile_name" value="NAME"></input>
+			<h1>Launch Config</h1>
+			<!-- <input type="text" class="largeText" id="config_name" value="NAME"></input> -->
 			<div id="installMode">
 				<br/>
 				Installion mode:
@@ -164,7 +164,7 @@ function setExe(exe){
 			</p>
 
 			<br/>
-			<a onclick="profileOverlay(false)">Confirm</a>
+			<a onclick="configOverlay(false)">Confirm</a>
 		</content>
 	</div>
 
