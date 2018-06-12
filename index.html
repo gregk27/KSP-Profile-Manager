@@ -107,6 +107,16 @@ ipcRenderer.on("get-config", function(event, arg) {
 
 });
 
+function getMods(){
+	ipcRenderer.send("get-mods");
+}
+
+ipcRenderer.on("get-mods", function(event, arg){
+	console.log(arg.split(";"));
+});
+
+getMods();
+
 function setExe(exe){
 	document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
 }

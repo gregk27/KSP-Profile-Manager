@@ -1,5 +1,21 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 const fs = require("fs");
+const { lstatSync, readdirSync } = require('fs')
+const { join } = require('path')
+
+const isDirectory = source => lstatSync(source).isDirectory()
+function getDirectories(source){
+  var dirString = readdirSync(source).map(name => join(source, name)).filter(isDirectory);
+	var dirs = "";
+
+	for(var i = 0; i<dirString.length; i++){
+		dirs += dirString[i].replace(source+"\\", "")+";";
+	}
+
+	return dirs;
+}
+
+
 
 var config = {
 	"name":"config 1",
@@ -13,9 +29,6 @@ fs.readFile('config.txt', 'utf-8' ,function(err, buf) {
 	config=(JSON.parse(buf.toString()));
 	console.log(config)
 });
-
-
-
 
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
 
@@ -82,4 +95,9 @@ ipcMain.on("set-config", function(event, arg){
 
 ipcMain.on("request-config", function(event){
 	event.sender.send("get-config", config);
+})
+
+
+ipcMain.on("get-mods", function(event){
+	event.sender.send("get-mods", getDirectories("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\GameData"))
 })
