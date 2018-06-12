@@ -112,7 +112,18 @@ function getMods(){
 }
 
 ipcRenderer.on("get-mods", function(event, arg){
-	console.log(arg.split(";"));
+	var mods = arg.split(";");
+	console.log(mods);
+
+	var out = ""
+
+	for(var i = 0; i<mods.length; i++){
+		out+="<li>"+mods[i]+"</li>\n"
+	}
+
+	document.getElementById("modList").innerHTML=out;
+	document.getElementById("modCount").innerHTML=mods.length;
+
 });
 
 getMods();
@@ -182,14 +193,14 @@ function setExe(exe){
 	<div class="profileName">[Name]<!--<a>&#9660;</a>--></div>
 	<section class="overview">
 		Version: 1.4.1<br/>
-		Mods: 100<br/>
-		Saves: 2<br/>
+		Mods: <span id="modCount">100</span><br/>
+		Saves: <span id="saveCount">2</span><br/>
 	</section>
 
 	<div style="width:100%; height:100%">
 	<section class="panel" id="mods">
 		<h1>Mods</h1>
-		<ul>
+		<ul id="modList">
 			<li>Item 1</li>
 			<li>Item 2</li>
 			<li>Item 3</li>
@@ -213,7 +224,7 @@ function setExe(exe){
 
 	<section class="panel" id="saves">
 		<h1>Saves</h1>
-		<ul>
+		<ul id="saveList">
 			<li>My first savegame<br/><span>Career</span></li>
 			<li>Item 2</li>
 			<li>Item 3</li>
