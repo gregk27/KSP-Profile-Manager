@@ -126,7 +126,26 @@ ipcRenderer.on("get-mods", function(event, arg){
 
 });
 
+function getSaves(){
+	ipcRenderer.send("get-saves");
+}
+
+ipcRenderer.on("get-saves", function(event, arg){
+	console.log(arg);
+	//
+	// var out = ""
+	//
+	// for(var i = 0; i<saves.length; i++){
+	// 	out+="<li>"+saves[i]+"</li>\n"
+	// }
+	//
+	// document.getElementById("saveList").innerHTML=out;
+	// document.getElementById("saveCount").innerHTML=mods.length;
+
+});
+
 getMods();
+getSaves();
 
 function setExe(exe){
 	document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
