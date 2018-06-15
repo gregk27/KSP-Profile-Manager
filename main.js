@@ -124,10 +124,6 @@ ipcMain.on("window-launch", function(){
 	});
 });
 
-ipcMain.on("window-config", function(){
-	configWindow = new BrowserWindow({width:320, height:240, frame: false});
-	window.loadFile('config.html');
-});
 
 ipcMain.on("set-config", function(event, arg){
 	config = arg;
