@@ -1,206 +1,208 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 
 <script>
-const {ipcRenderer} = require('electron')
+	const {ipcRenderer} = require('electron')
 
-console.log("INIT");
+	console.log("INIT");
 
-"Basic window functions"
-		function win_close(){
-			ipcRenderer.send('window-close');
+	"Basic window functions"
+			function win_close(){
+				ipcRenderer.send('window-close');
+			}
+			function win_max() {
+				ipcRenderer.send('window-max');
+			}
+			function win_min() {
+				ipcRenderer.send('window-min');
+			}
+	//-----------------------
+
+	"Backend requests"
+		//Send config request
+		function getconfig(){
+			ipcRenderer.send("request-config");
 		}
-		function win_max() {
-			ipcRenderer.send('window-max');
+		function getMods(){
+			ipcRenderer.send("get-mods");
 		}
-		function win_min() {
-			ipcRenderer.send('window-min');
+		function getSaves(){
+			ipcRenderer.send("get-saves");
 		}
-//-----------------------
+	//-----------------------
 
-"Backend requests"
-	//Send config request
-	function getconfig(){
-		ipcRenderer.send("request-config");
-	}
-	function getMods(){
-		ipcRenderer.send("get-mods");
-	}
-	function getSaves(){
-		ipcRenderer.send("get-saves");
-	}
-//-----------------------
-
-"Launch functions"
-	function win_launch(){
-		//Launch KSP
-		ipcRenderer.send("window-launch");
-		launchOverlay(true);
-	}
-	//Set launch overlay sate
-	function launchOverlay(state) {
-	if(state)
-		//Enable ovelay
-		document.getElementById("launchOverlay").style.display = "block";
-	else
-		//Disable overlay
-		document.getElementById("launchOverlay").style.display = "none";
-}
-//-----------------------
-
-"Config Overlay"
-	//Set config ovelay state
-	function configOverlay(state) {
-		if(state){
-			//Open overlay
-			document.getElementById("configOverlay").style.display = "block";
-			//Load config
-			getconfig();
+	"Launch functions"
+		function win_launch(){
+			//Launch KSP
+			ipcRenderer.send("window-launch");
+			launchOverlay(true);
 		}
-		else{
-			//Close overlay
-			document.getElementById("configOverlay").style.display = "none";
-			//Save config
-			setconfig();
-		}
-	}
-
-	//Set to automatic path input mode
-	function steamMode(){
-		document.getElementById("ksp_path").disabled=true;
-		document.getElementById("exeVersion").style.display='inline';
-	}
-
-	//Set to manual path input mode
-	function manualMode(){
-		document.getElementById("ksp_path").disabled=false;
-		document.getElementById("exeVersion").style.display='none';
-	}
-
-	//Save config
-	function setconfig(){
-		var mode = "";
-		var version = "";
-
-		//Get mode
-		if(document.getElementById("installation_steam").checked)
-			mode="steam";
+		//Set launch overlay sate
+		function launchOverlay(state) {
+		if(state)
+			//Enable ovelay
+			document.getElementById("launchOverlay").style.display = "block";
 		else
-			mode='manual';
-
-		//Get EXE version
-		if(document.getElementById("version_64").checked)
-			version="64";
-		else
-			version="32";
-
-		//Create JSON object
-		var config = {
-			"name":name,
-			"mode":mode,
-			"version":version,
-			"path":document.getElementById("ksp_path").value,
-		}
-
-		//Send to backend
-		ipcRenderer.send("set-config", config);
+			//Disable overlay
+			document.getElementById("launchOverlay").style.display = "none";
 	}
+	//-----------------------
 
-	//Revceive config from backend
-	ipcRenderer.on("get-config", function(event, arg) {
-		//Set install mode
-		if(arg["mode"] == "steam"){
-			document.getElementById("installation_steam").checked = true;
-			steamMode();
+	"Config Overlay"
+		//Set config ovelay state
+		function configOverlay(state) {
+			if(state){
+				//Open overlay
+				document.getElementById("configOverlay").style.display = "block";
+				//Load config
+				getconfig();
+			}
+			else{
+				//Close overlay
+				document.getElementById("configOverlay").style.display = "none";
+				//Save config
+				setconfig();
+			}
 		}
-		else{
-			document.getElementById("installation_manual").checked = true;
-			manualMode();
+
+		//Set to automatic path input mode
+		function steamMode(){
+			document.getElementById("ksp_path").disabled=true;
+			document.getElementById("exeVersion").style.display='inline';
 		}
 
-		//Set EXE version
-		if(arg["version"] == "64")
-			document.getElementById("version_64").checked = true;
-		else
-			document.getElementById("version_32").checked = true;
+		//Set to manual path input mode
+		function manualMode(){
+			document.getElementById("ksp_path").disabled=false;
+			document.getElementById("exeVersion").style.display='none';
+		}
 
-		//Set KSP path
-		document.getElementById("ksp_path").value = arg["path"];
+		//Save config
+		function setconfig(){
+			var mode = "";
+			var version = "";
 
+			//Get mode
+			if(document.getElementById("installation_steam").checked)
+				mode="steam";
+			else
+				mode='manual';
+
+			//Get EXE version
+			if(document.getElementById("version_64").checked)
+				version="64";
+			else
+				version="32";
+
+			//Create JSON object
+			var config = {
+				"name":name,
+				"mode":mode,
+				"version":version,
+				"path":document.getElementById("ksp_path").value,
+			}
+
+			//Send to backend
+			ipcRenderer.send("set-config", config);
+		}
+
+		//Revceive config from backend
+		ipcRenderer.on("get-config", function(event, arg) {
+			//Set install mode
+			if(arg["mode"] == "steam"){
+				document.getElementById("installation_steam").checked = true;
+				steamMode();
+			}
+			else{
+				document.getElementById("installation_manual").checked = true;
+				manualMode();
+			}
+
+			//Set EXE version
+			if(arg["version"] == "64")
+				document.getElementById("version_64").checked = true;
+			else
+				document.getElementById("version_32").checked = true;
+
+			//Set KSP path
+			document.getElementById("ksp_path").value = arg["path"];
+
+		});
+
+		//Set path to EXE (steam mode)
+		function setExe(exe){
+			document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
+		}
+	//-----------------------
+
+	ipcRenderer.on("get-mods", function(event, arg){
+
+		var mods = arg.split(";");
+
+		var out = ""
+
+		//Create mod list
+		for(var i = 0; i<mods.length; i++){
+			out+="<li>"+mods[i]+"</li>\n"
+		}
+
+		//Set mod list
+		document.getElementById("modList").innerHTML=out;
+		//Set mod count
+		document.getElementById("modCount").innerHTML=mods.length;
 	});
 
-	//Set path to EXE (steam mode)
-	function setExe(exe){
-		document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
-	}
-//-----------------------
+	ipcRenderer.on("get-saves", function(event, saves){
 
-ipcRenderer.on("get-mods", function(event, arg){
+		var out = ""
 
-	var mods = arg.split(";");
+		//Create saves list
+		for(var i = 0; i<saves.length; i++){
 
-	var out = ""
+			var meta="";
 
-	//Create mod list
-	for(var i = 0; i<mods.length; i++){
-		out+="<li>"+mods[i]+"</li>\n"
-	}
+			//Fist line of metadata, mode and flight count
+			if(saves[i]["flights"]=="1") var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flight";
+			else var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flights";
+			//Funds metadata
+			var funds = "<span style='color:#2ae21d'>"+saves[i]["funds"]+"</span>; ";
+			//Science metadata
+			var science = "<span style='color:#1de2d1'>"+saves[i]["science"]+"</span>; ";
+			//Reputation metadata
+			var rep = "<span style='color:#efe51c'>"+saves[i]["reputation"]+"</span>; ";
 
-	//Set mod list
-	document.getElementById("modList").innerHTML=out;
-	//Set mod count
-	document.getElementById("modCount").innerHTML=mods.length;
-});
+			//Sandbox mode, display simple data
+			if(saves[i]["mode"]=="SANDBOX") meta = line1
+			//Science mode, show science and rep
+			if(saves[i]["mode"]=="SCIENCE") meta = line1+"<br/>"+science+rep
+			//Career mode, show all data
+			if(saves[i]["mode"]=="CAREER") meta = line1+"<br/>"+funds+science+rep
 
-ipcRenderer.on("get-saves", function(event, saves){
+			//Add save to list
+			out+="<li>"+saves[i]["name"]+"<br/><div>"+meta+"</div></li>\n"
+		}
 
-	var out = ""
-
-	//Create saves list
-	for(var i = 0; i<saves.length; i++){
-
-		var meta="";
-
-		//Fist line of metadata, mode and flight count
-		if(saves[i]["flights"]=="1") var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flight";
-		else var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flights";
-		//Funds metadata
-		var funds = "<span style='color:#2ae21d'>"+saves[i]["funds"]+"</span>; ";
-		//Science metadata
-		var science = "<span style='color:#1de2d1'>"+saves[i]["science"]+"</span>; ";
-		//Reputation metadata
-		var rep = "<span style='color:#efe51c'>"+saves[i]["reputation"]+"</span>; ";
-
-		//Sandbox mode, display simple data
-		if(saves[i]["mode"]=="SANDBOX") meta = line1
-		//Science mode, show science and rep
-		if(saves[i]["mode"]=="SCIENCE") meta = line1+"<br/>"+science+rep
-		//Career mode, show all data
-		if(saves[i]["mode"]=="CAREER") meta = line1+"<br/>"+funds+science+rep
-
-		//Add save to list
-		out+="<li>"+saves[i]["name"]+"<br/><div>"+meta+"</div></li>\n"
-	}
-
-	//Set save list
-	document.getElementById("saveList").innerHTML=out;
-	//Set save count
-	document.getElementById("saveCount").innerHTML=saves.length;
-});
+		//Set save list
+		document.getElementById("saveList").innerHTML=out;
+		//Set save count
+		document.getElementById("saveCount").innerHTML=saves.length;
+	});
 
 
-//Get mods and saves on start
-getMods();
-getSaves();
+	//Get mods and saves on start
+	getMods();
+	getSaves();
 </script>
 
 <body>
+	<!-- Header bar, contains config button and window buttons -->
 	<header>
-      <a class="menu" id="config" onclick="configOverlay(true)"><div>&#9965;</div></a>
+	  <a class="menu" id="config" onclick="configOverlay(true)"><div>&#9965;</div></a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
 
+	<!-- Popup overlay that appears when launch button is pressed -->
 	<div class="overlay" id="launchOverlay" >
 		<content>
 			<h1>Game Launched</h1>
@@ -209,10 +211,11 @@ getSaves();
 		</content>
 	</div>
 
+	<!-- Popup overlay that appears when config button is pressed -->
 	<div class="overlay" id="configOverlay">
 		<content>
 			<h1>Launch Config</h1>
-			<!-- <input type="text" class="largeText" id="config_name" value="NAME"></input> -->
+			<!-- Installation mode selection -->
 			<div id="installMode">
 				<br/>
 				Installion mode:
@@ -225,6 +228,8 @@ getSaves();
 					<span class="checkmark"></span>
 				</label>
 			</div>
+
+			<!-- EXE version selection -->
 			<div id="exeVersion" style="display:inline">
 				<br/>
 				Exe version:
@@ -238,6 +243,7 @@ getSaves();
 				</label>
 			</div>
 
+			<!-- Path input/display -->
 			<p>
 				Path:
 				<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
@@ -248,26 +254,29 @@ getSaves();
 		</content>
 	</div>
 
-
+	<!-- Profile name display -->
 	<div class="profileName">[Name]<!--<a>&#9660;</a>--></div>
+
+	<!-- Short information overview, version + mod/save count -->
 	<section class="overview">
 		Version: 1.4.1<br/>
 		Mods: <span id="modCount">100</span><br/>
 		Saves: <span id="saveCount">2</span><br/>
 	</section>
 
+	<!-- Mod and savegame list -->
 	<div style="width:100%; height:100%">
-	<section class="panel" id="mods">
-		<h1>Mods</h1>
-		<ul id="modList">
-		</ul>
-	</section>
+		<section class="panel" id="mods">
+			<h1>Mods</h1>
+			<ul id="modList">
+			</ul>
+		</section>
 
-	<section class="panel" id="saves">
-		<h1>Saves</h1>
-		<ul id="saveList">
-		</ul>
-	</section>
+		<section class="panel" id="saves">
+			<h1>Saves</h1>
+			<ul id="saveList">
+			</ul>
+		</section>
 	</div>
 
 	<footer>
