@@ -63,9 +63,17 @@ function parseSFS(path){
 	return(JSON.parse(data)['GAME'])
 }
 
-
-
-
+function commaFormat(num){
+  num=""+num;
+  out = "";
+  for(var i = num.length-1; i>=0; i--){
+    out+=num[num.length-i-1];
+    if((i%3)==0){
+      out+=",";
+    }
+  }
+  return(out.replace(/,$/g, ""));
+}
 
 var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
 
@@ -141,19 +149,42 @@ ipcMain.on("get-mods", function(event){
 ipcMain.on("get-saves", function(event){
 	var saveDirs = getDirectories(config["path"].substr(0, config["path"].lastIndexOf("\\"))+"\\saves", true);
 
-	var saves = {};
+	var saves = [];
 
-	// var data = fs.readFileSync("tests.txt", 'utf-8').replace(/ = /g, "': '").replace(/\n/g, "'\n");
-	// console.log(data)
-	event.sender.send("get-saves", parseSFS("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\saves\\Hard Career\\persistent.sfs"));
-	// for(var i=0; i<saveDirs.length; i++){
-	// 	// console.log(fs.readFileSync(saveDirs[i]+"\\persistent.sfs", 'utf-8'));
-	// 	var data = parseSFS(saveDirs[i]+"\\persistent.sfs");
-	//
-	// 	var name = data["Title"].replace(/ \([A-Z]*\)/g, "")
-	// 	var mode = data["Mode"];
-	// 	var funds = data["SCENARIO"]["funds"]
-	// 	console.log(name+"\t"+mode+"\t"+funds)
-	// }
+	for(var i=0; i<saveDirs.length; i++){
+    if(saveDirs[i].endsWith("scenarios")||saveDirs[i].endsWith("training")) continue;
+
+    var data = fs.readFileSync(saveDirs[i]+"\\persistent.sfs", "utf-8").replace(/\r/g, "").replace(/\\/g, "\\\\");
+
+    var title = data.match(/Title = (.*)\(/)[1];
+    var mode = data.match(/Mode = (.*)/)[1];
+    try{
+      var funds = commaFormat(data.match(/funds = (.*)\./)[1]);
+    } catch(e){
+      var funds = 0;
+    }
+    try{
+      var rep = commaFormat(data.match(/rep = (.*)\./)[1]);
+    } catch(e){
+      var rep = 0;
+    }
+    try{
+      var science = commaFormat(data.match(/name = ResearchAndDevelopment\n\t*.*\n\t*sci = (.*)\./)[1]);
+    } catch(e){
+      var science = 0;
+    }
+    var flights = ""+data.match(/VESSEL\n.*\n.*\n.*\n.*\n\t*type = [^D|F]/g).length
+
+    saves.push({
+      "name":title,
+      "mode":mode,
+      "funds":funds,
+      "science":science,
+      "reputation":rep,
+      "flights":flights
+    })
+	}
+  event.sender.send("get-saves", saves);
+
 
 })

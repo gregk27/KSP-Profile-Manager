@@ -308,7 +308,7 @@ footer{
 	font-size: 20px;
 }
 
-.panel#saves ul li span{
+.panel#saves ul li div{
 	font-size:12px;
 	vertical-align: top;
 	padding-left: 15%;

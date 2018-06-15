@@ -130,17 +130,28 @@ function getSaves(){
 	ipcRenderer.send("get-saves");
 }
 
-ipcRenderer.on("get-saves", function(event, arg){
-	console.log(arg);
-	//
-	// var out = ""
-	//
-	// for(var i = 0; i<saves.length; i++){
-	// 	out+="<li>"+saves[i]+"</li>\n"
-	// }
-	//
-	// document.getElementById("saveList").innerHTML=out;
-	// document.getElementById("saveCount").innerHTML=mods.length;
+ipcRenderer.on("get-saves", function(event, saves){
+	console.log(saves);
+
+	var out = ""
+	for(var i = 0; i<saves.length; i++){
+		var meta="";
+
+		if(saves[i]["flights"]=="1") var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flight";
+		else var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flights";
+		var funds = "<span style='color:#2ae21d'>"+saves[i]["funds"]+"</span>; ";
+		var science = "<span style='color:#1de2d1'>"+saves[i]["science"]+"</span>; ";
+		var rep = "<span style='color:#efe51c'>"+saves[i]["reputation"]+"</span>; ";
+
+		if(saves[i]["mode"]=="SANDBOX") meta = line1
+		if(saves[i]["mode"]=="SCIENCE") meta = line1+"<br/>"+science+rep
+		if(saves[i]["mode"]=="CAREER") meta = line1+"<br/>"+funds+science+rep
+
+		out+="<li>"+saves[i]["name"]+"<br/><div>"+meta+"</div></li>\n"
+	}
+
+	document.getElementById("saveList").innerHTML=out;
+	document.getElementById("saveCount").innerHTML=mods.length;
 
 });
 
