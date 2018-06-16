@@ -222,6 +222,7 @@ ipcMain.on("create-profile", function(event, arg){
   fs.mkdirSync(path+"\\profiles\\"+arg);
   fs.mkdirSync(path+"\\profiles\\"+arg+"\\GameData");
   fs.mkdirSync(path+"\\profiles\\"+arg+"\\saves");
+  fs.mkdirSync(path+"\\profiles\\"+arg+"\\CKAN");
   event.sender.send("new-profile-created");
 })
 
@@ -230,8 +231,10 @@ ipcMain.on("change-profile", function(event,arg){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   fs.rmdirSync(location+"\\saves")
   fs.rmdirSync(location+"\\GameData")
+  fs.rmdirSync(location+"\\CKAN")
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\saves", location+"\\saves", 'junction');
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\GameData", location+"\\GameData", "junction");
+  fs.symlinkSync(path+"\\profiles\\"+arg+"\\CKAN", location+"\\CKAN", "junction");
   event.sender.send("update-saves");
   event.sender.send("update-mods");
 })
