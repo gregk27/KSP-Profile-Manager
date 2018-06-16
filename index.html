@@ -28,6 +28,9 @@
 		function getSaves(){
 			ipcRenderer.send("get-saves");
 		}
+		function getProfiles(){
+			ipcRenderer.send("get-profiles")
+		}
 	//-----------------------
 
 	"Launch functions"
@@ -187,10 +190,17 @@
 		document.getElementById("saveCount").innerHTML=saves.length;
 	});
 
+	ipcRenderer.on("get-profiles", function(event, profiles){
+		var data = JSON.parse(profiles);
+
+
+	})
+
 
 	//Get mods and saves on start
 	getMods();
 	getSaves();
+	getProfiles();
 </script>
 
 <body>
@@ -255,7 +265,18 @@
 	</div>
 
 	<!-- Profile name display -->
-	<div class="profileName">[Name]<!--<a>&#9660;</a>--></div>
+    <div class="selectdiv">
+      <label>
+        <select class="profileName">
+          <option selected> Select Box </option>
+          <option>Option 1</option>
+          <option>Option 2</option>
+          <option>Last long option test</option>
+        </select>
+      </label>
+      <a class="load">Load</a>
+    </div>
+
 
 	<!-- Short information overview, version + mod/save count -->
 	<section class="overview">
