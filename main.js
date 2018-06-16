@@ -35,22 +35,24 @@ var config = {
 
 var path = app.getPath('userData')
 
-console.log(path+"\\config.txt");
+console.log(path+"\\config.json");
 
 //Load config
-fs.readFile(path+'\\config.txt', 'utf-8', function(err, buf) {
+fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
   try{
     var data = JSON.parse(buf.toString());
     config=data;
     console.log(config)
   } catch(e){
     console.log("Config not found, reverting to default")
-    fs.writeFile(path+'\\config.txt', JSON.stringify(config), function(err, data){
+    fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
       if (err) console.log(err);
       console.log("Successfully Written to File.");
     });
   }
 });
+
+console.log(config["profile"]["profiles"][config["profile"]["selected"]])
 
 //Parses ksp save file to JSON
 function parseSFS(path){
@@ -131,9 +133,10 @@ ipcMain.on("window-launch", function(){
 
 //Write config data to file
 ipcMain.on("set-config", function(event, arg){
-  config = arg;
-  console.log(config);
-  fs.writeFile(path+'\\config.txt', JSON.stringify(config), function(err, data){
+  config["mode"]=arg["mode"];
+  config["version"]=arg["version"];
+  config["path"]=arg["path"];
+  fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
     if (err) console.log(err);
     console.log("Successfully Written to File.");
   });
@@ -200,4 +203,35 @@ ipcMain.on("get-saves", function(event){
   }
   //Send to renderer
   event.sender.send("get-saves", saves);
+})
+
+//Send profile data to renderer
+ipcMain.on("get-profiles", function(event){
+  event.sender.send("get-profiles", JSON.stringify(config["profile"]));
+})
+
+
+ipcMain.on("create-profile", function(event, arg){
+  config["profile"]["profiles"].push(arg)
+  config["profile"]["selected"] = config["profile"]["profiles"].length-1;
+  fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
+    if (err) console.log(err);
+    console.log("Successfully Written to File.");
+  });
+  console.log(path+"\\profiles\\"+arg);
+  fs.mkdirSync(path+"\\profiles\\"+arg);
+  fs.mkdirSync(path+"\\profiles\\"+arg+"\\GameData");
+  fs.mkdirSync(path+"\\profiles\\"+arg+"\\saves");
+  event.sender.send("new-profile-created");
+})
+
+
+ipcMain.on("change-profile", function(event,arg){
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+  fs.rmdirSync(location+"\\saves")
+  fs.rmdirSync(location+"\\GameData")
+  fs.symlinkSync(path+"\\profiles\\"+arg+"\\saves", location+"\\saves", 'junction');
+  fs.symlinkSync(path+"\\profiles\\"+arg+"\\GameData", location+"\\GameData", "junction");
+  event.sender.send("update-saves");
+  event.sender.send("update-mods");
 })

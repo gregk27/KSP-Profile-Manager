@@ -190,12 +190,58 @@
 		document.getElementById("saveCount").innerHTML=saves.length;
 	});
 
-	ipcRenderer.on("get-profiles", function(event, profiles){
-		var data = JSON.parse(profiles);
+	ipcRenderer.on("get-profiles", function(event, raw){
+		var data = JSON.parse(raw);
+		var out = ""
+		var profiles = data["profiles"]
 
+		for(var i = 0; i < profiles.length; i++){
+			out+="<option";
+			if(i==data["selected"]){
+				out+=" selected"
+			}
+			out+=">"+profiles[i]+"</option>\n"
+		}
+
+		//Set save list
+		document.getElementById("profiles").innerHTML=out;
 
 	})
 
+
+	function newProfileOverlay(state){
+		if(state){
+			//Open overlay
+			document.getElementById("newProfile").style.display = "block";
+		}
+		else{
+			//Close overlay
+			document.getElementById("newProfile").style.display = "none";
+		}
+	}
+
+	function createProfile(){
+		var name = document.getElementById("new_profile_name").value;
+		ipcRenderer.send("create-profile", name);
+	}
+
+	ipcRenderer.on("new-profile-created", function(){
+		//When a new profile is created, set it as active
+		getProfiles();
+	})
+
+	function changeProfile(){
+		var selected = document.getElementById("profiles").value;
+		ipcRenderer.send("change-profile", selected)
+	}
+
+	ipcRenderer.on("update-saves", function(){
+		getSaves();
+	})
+
+	ipcRenderer.on("update-mods", function(){
+		getMods();
+	})
 
 	//Get mods and saves on start
 	getMods();
@@ -207,6 +253,8 @@
 	<!-- Header bar, contains config button and window buttons -->
 	<header>
 	  <a class="menu" id="config" onclick="configOverlay(true)"><div>&#9965;</div></a>
+		<a class="menu" onclick="newProfileOverlay(true)">New Profile</a>
+		<a class="menu" onclick="">Edit Profile</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
@@ -220,6 +268,18 @@
 			<a onclick="launchOverlay(false)">Dismiss</a>
 		</content>
 	</div>
+
+	<!-- Popup overlay that appears when launch button is pressed -->
+	<div class="overlay" id="newProfile" >
+		<content>
+			<h1>Create Profile</h1>
+			Prfile Name:<input type="text" class="text" id="new_profile_name" value="New Profile"></input>
+			<br/><br/>
+			<a onclick="newProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
+			<a onclick="createProfile()" style="width:40%; float:right; clear:none">Create</a>
+		</content>
+	</div>
+
 
 	<!-- Popup overlay that appears when config button is pressed -->
 	<div class="overlay" id="configOverlay">
@@ -265,16 +325,16 @@
 	</div>
 
 	<!-- Profile name display -->
-    <div class="selectdiv">
+  <div class="selectdiv">
       <label>
-        <select class="profileName">
+        <select class="profileName" id="profiles">
           <option selected> Select Box </option>
           <option>Option 1</option>
           <option>Option 2</option>
           <option>Last long option test</option>
         </select>
       </label>
-      <a class="load">Load</a>
+      <a onclick="changeProfile()" class="load">Load</a>
     </div>
 
 
