@@ -1,7 +1,7 @@
 {
-  "name": "profile-manager",
+  "name": "KSP-Profile-Manager",
   "version": "1.0.0",
-  "description": "testbed for scouting software",
+  "description": "Profile manager for Kerbal Space Program",
   "main": "main.js",
   "scripts": {
     "test": "electron ."

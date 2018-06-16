@@ -26,13 +26,30 @@ function getDirectories(source, raw){
 var config = {
   "mode":"steam",
   "version":"64",
-  "path":"C:\\Program Files\\KSP_x64"
+  "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
+  "profile":{
+    "selected":0,
+    "profiles":["Test"]
+  }
 };
 
+var path = app.getPath('userData')
+
+console.log(path+"\\config.txt");
+
 //Load config
-fs.readFile('config.txt', 'utf-8', function(err, buf) {
-  config=(JSON.parse(buf.toString()));
-  console.log(config)
+fs.readFile(path+'\\config.txt', 'utf-8', function(err, buf) {
+  try{
+    var data = JSON.parse(buf.toString());
+    config=data;
+    console.log(config)
+  } catch(e){
+    console.log("Config not found, reverting to default")
+    fs.writeFile(path+'\\config.txt', JSON.stringify(config), function(err, data){
+      if (err) console.log(err);
+      console.log("Successfully Written to File.");
+    });
+  }
 });
 
 //Parses ksp save file to JSON
@@ -73,8 +90,7 @@ function commaFormat(num){
   return(out.replace(/,$/g, ""));
 }
 
-var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe";//"C:\\Windows\\System32\\calc.exe";
-
+// var path = "C:\\Users\\P\\AppData\\Roaming\\KSP profiles"
 var window;
 
 
@@ -117,7 +133,7 @@ ipcMain.on("window-launch", function(){
 ipcMain.on("set-config", function(event, arg){
   config = arg;
   console.log(config);
-  fs.writeFile('config.txt', JSON.stringify(config), function(err, data){
+  fs.writeFile(path+'\\config.txt', JSON.stringify(config), function(err, data){
     if (err) console.log(err);
     console.log("Successfully Written to File.");
   });
