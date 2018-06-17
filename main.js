@@ -136,10 +136,6 @@ ipcMain.on("set-config", function(event, arg){
   config["mode"]=arg["mode"];
   config["version"]=arg["version"];
   config["path"]=arg["path"];
-  fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
-    if (err) console.log(err);
-    console.log("Successfully Written to File.");
-  });
 });
 
 //Send config to renderer
@@ -210,14 +206,10 @@ ipcMain.on("get-profiles", function(event){
   event.sender.send("get-profiles", JSON.stringify(config["profile"]));
 })
 
-
 ipcMain.on("create-profile", function(event, arg){
   config["profile"]["profiles"].push(arg)
   config["profile"]["selected"] = config["profile"]["profiles"].length-1;
-  fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
-    if (err) console.log(err);
-    console.log("Successfully Written to File.");
-  });
+  saveConfig();
   console.log(path+"\\profiles\\"+arg);
   fs.mkdirSync(path+"\\profiles\\"+arg);
   fs.mkdirSync(path+"\\profiles\\"+arg+"\\GameData");
@@ -225,7 +217,6 @@ ipcMain.on("create-profile", function(event, arg){
   fs.mkdirSync(path+"\\profiles\\"+arg+"\\CKAN");
   event.sender.send("new-profile-created");
 })
-
 
 ipcMain.on("change-profile", function(event,arg){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
@@ -241,9 +232,13 @@ ipcMain.on("change-profile", function(event,arg){
 ipcMain.on("rename-profile", function(event, oldName, newName){
   config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName;
   fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
+  saveConfig();
+  event.sender.send("profile-renamed", newName);
+})
+
+function saveConfig(){
   fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
     if (err) console.log(err);
     console.log("Successfully Written to File.");
   });
-  event.sender.send("profile-renamed", newName);
-})
+}
