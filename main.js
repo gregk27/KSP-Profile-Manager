@@ -206,10 +206,15 @@ ipcMain.on("get-profiles", function(event){
   event.sender.send("get-profiles", JSON.stringify(config["profile"]));
 })
 
+//Create new profile
 ipcMain.on("create-profile", function(event, arg){
+  //Add profile
   config["profile"]["profiles"].push(arg)
+  //Select profile
   config["profile"]["selected"] = config["profile"]["profiles"].length-1;
+  //Update config save
   saveConfig();
+  //Create new folders
   console.log(path+"\\profiles\\"+arg);
   fs.mkdirSync(path+"\\profiles\\"+arg);
   fs.mkdirSync(path+"\\profiles\\"+arg+"\\GameData");
@@ -218,24 +223,32 @@ ipcMain.on("create-profile", function(event, arg){
   event.sender.send("new-profile-created");
 })
 
+//Change location of links
 ipcMain.on("change-profile", function(event,arg){
+  //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+  //Delete old links
   fs.rmdirSync(location+"\\saves")
   fs.rmdirSync(location+"\\GameData")
   fs.rmdirSync(location+"\\CKAN")
+  //Create new links
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\saves", location+"\\saves", 'junction');
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\GameData", location+"\\GameData", "junction");
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\CKAN", location+"\\CKAN", "junction");
   event.sender.send("refresh");
 })
 
+//Renames a profile and associated folders
 ipcMain.on("rename-profile", function(event, oldName, newName){
+  //Rename in config
   config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName;
-  fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
   saveConfig();
+  //Rename folder
+  fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
   event.sender.send("profile-renamed", newName);
 })
 
+//Saves to config to file
 function saveConfig(){
   fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
     if (err) console.log(err);
