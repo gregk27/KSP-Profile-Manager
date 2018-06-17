@@ -235,11 +235,28 @@
 		ipcRenderer.send("change-profile", selected)
 	}
 
-	ipcRenderer.on("update-saves", function(){
-		getSaves();
+	function renameProfile(newName){
+		ipcRenderer.send("rename-profile", document.getElementById("profiles").value, document.getElementById("changed_profile_name").value)
+	}
+
+	function renameProfileOverlay(state){
+		if(state){
+			//Open overlay
+			document.getElementById("renameProfile").style.display = "block";
+		}
+		else{
+			//Close overlay
+			document.getElementById("renameProfile").style.display = "none";
+		}
+	}
+
+	ipcRenderer.on("profile-renamed", function(event, arg){
+		ipcRenderer.send("changeProfile", arg);
+		getProfiles();
 	})
 
-	ipcRenderer.on("update-mods", function(){
+	ipcRenderer.on("refresh", function(){
+		getSaves();
 		getMods();
 	})
 
@@ -254,7 +271,7 @@
 	<header>
 	  <a class="menu" id="config" onclick="configOverlay(true)"><div>&#9965;</div></a>
 		<a class="menu" onclick="newProfileOverlay(true)">New Profile</a>
-		<a class="menu" onclick="">Edit Profile</a>
+		<a class="menu" onclick="renameProfileOverlay(true)">Rename Profile</a>
 		<a class="close" id="close" onclick="win_close()">&times;</a>
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
@@ -273,10 +290,21 @@
 	<div class="overlay" id="newProfile" >
 		<content>
 			<h1>Create Profile</h1>
-			Prfile Name:<input type="text" class="text" id="new_profile_name" value="New Profile"></input>
+			Profile Name:  <input type="text" class="text" id="new_profile_name" value="New Profile"></input>
 			<br/><br/>
 			<a onclick="newProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
 			<a onclick="createProfile()" style="width:40%; float:right; clear:none">Create</a>
+		</content>
+	</div>
+
+	<!-- Popup overlay that appears when launch button is pressed -->
+	<div class="overlay" id="renameProfile" >
+		<content>
+			<h1>Rename Profile</h1>
+			New Name:  <input type="text" class="text" id="changed_profile_name" value="New name"></input>
+			<br/><br/>
+			<a onclick="renameProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
+			<a onclick="renameProfile()" style="width:40%; float:right; clear:none">Create</a>
 		</content>
 	</div>
 

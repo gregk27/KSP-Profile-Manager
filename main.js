@@ -235,6 +235,15 @@ ipcMain.on("change-profile", function(event,arg){
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\saves", location+"\\saves", 'junction');
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\GameData", location+"\\GameData", "junction");
   fs.symlinkSync(path+"\\profiles\\"+arg+"\\CKAN", location+"\\CKAN", "junction");
-  event.sender.send("update-saves");
-  event.sender.send("update-mods");
+  event.sender.send("refresh");
+})
+
+ipcMain.on("rename-profile", function(event, oldName, newName){
+  config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName;
+  fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
+  fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
+    if (err) console.log(err);
+    console.log("Successfully Written to File.");
+  });
+  event.sender.send("profile-renamed", newName);
 })
