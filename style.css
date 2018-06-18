@@ -344,6 +344,14 @@ footer{
 	color:#628b23;
 	font-size:20px
 }
+.x{
+	display:none;
+	float:left;
+	margin-right:10px;
+	color:red;
+	font-size:20px
+}
+
 
 @keyframes spin {
 	0% { transform: rotate(0deg); }

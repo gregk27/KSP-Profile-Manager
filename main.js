@@ -158,38 +158,53 @@ ipcMain.on('initialize', function(event, data){
   if(!fs.existsSync(location+"\\CKAN")){
     fs.mkdirSync(profilePath+"\\CKAN")
     fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-    event.sender.send("ckan-complete");
+    event.sender.send("complete", "ckan");
   } else{
     ncp(location+"\\CKAN", profilePath+"\\CKAN", function(err){
       // console.log(fs.existsSync(profilePath+"\\CKAN"))
       // console.log(profilePath+"\\CKAN"+"<-"+location+"\\CKAN")
-	  console.log("CKAN COPIED")
+      if(err){
+        console.log("CKAN FAILED")
+        event.sender.send("failed", "ckan");
+        return;
+      }
+	    console.log("CKAN COPIED")
       rimraf(location+"\\CKAN", [], function(){
-		console.log("CKAN DELETED")
-		fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-		event.sender.send("ckan-complete");
-	  });
+    		console.log("CKAN DELETED")
+    		fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+    		event.sender.send("complete", "ckan");
+  	  });
     })
   }
   ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
     // console.log(fs.existsSync(profilePath+"\\GameData"))
     // console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
+    if(err){
+      console.log("GameData FAILED")
+  		event.sender.send("failed", "gameData");
+      return;
+    }
 	  console.log("GameData COPIED")
-	rimraf(location+"\\GameData", [],  function(){
-		console.log("GameData DELETED")
-		fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
-		event.sender.send("gamedata-complete");
-	});
+  	rimraf(location+"\\GameData", [],  function(){
+  		console.log("GameData DELETED")
+  		fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
+  		event.sender.send("complete", "gameData");
+  	});
   })
   ncp(location+"\\saves", profilePath+"\\saves", function(err){
     // console.log(fs.existsSync(profilePath+"\\saves"))
     // console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
+    if(err){
+      console.log("saves FAILED")
+  		event.sender.send("failed", "saves");
+      return;
+    }
 	  console.log("CKAN COPIED")
     rimraf(location+"\\saves", [],  function(){
-		console.log("saves DELETED")
+  		console.log("saves DELETED")
 	    fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
-		event.sender.send("saves-complete");
-	});
+  		event.sender.send("complete", "saves");
+	   });
   })
 })
 
@@ -263,7 +278,7 @@ ipcMain.on("get-saves", function(event){
     }
     //Get flights not marked as Debris or Probe
     var flights = ""+data.match(/VESSEL\n.*\n.*\n.*\n.*\n\t*type = [^D|F]/g).length
-	
+
 	//Add JSON to saves
     saves.push({
       "name":title,

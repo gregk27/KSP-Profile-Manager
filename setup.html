@@ -68,25 +68,16 @@
 	  document.getElementById("progress").style.display="block";
 	}
 
-	ipcRenderer.on("ckan-complete", function(){
-	  document.getElementById("ckan_spin").style.display="none";
-	  document.getElementById("ckan_check").style.display="block";
+	ipcRenderer.on("complete", function(e, target){
+	  document.getElementById(target+"_spin").style.display="none";
+	  document.getElementById(target+"_check").style.display="block";
 		stepsComplete++;
 		checkSteps();
 	})
 
-	ipcRenderer.on("gamedata-complete", function(){
-	  document.getElementById("gameData_spin").style.display="none";
-	  document.getElementById("gameData_check").style.display="block";
-		stepsComplete++;
-		checkSteps();
-	})
-
-	ipcRenderer.on("saves-complete", function(){
-	  document.getElementById("saves_spin").style.display="none";
-	  document.getElementById("saves_check").style.display="block";
-		stepsComplete++;
-		checkSteps();
+	ipcRenderer.on("failed", function(e, target){
+		document.getElementById(target+"_spin").style.display="none";
+		document.getElementById(target+"_x").style.display="block";
 	})
 
 	function checkSteps(){
@@ -148,9 +139,9 @@
 	</div>
 	<div id="progress" style="display:none">
 		<h1>Progress</h1>
-		<h3><span class="check" id="gameData_check">&#10003; </span>GameData<div class="loader"  id="gameData_spin"></div></h3>
-		<h3><span class="check" id="saves_check">&#10003; </span>Saves<div class="loader" id="saves_spin"></div></h3>
-		<h3><span class="check" id="ckan_check">&#10003; </span>CKAN<div class="loader" id="ckan_spin"></div></h3>
+		<h3><span class="check" id="gameData_check">&#10003;</span><span class="x" id="gameData_x">&times;</span>GameData<div class="loader"  id="gameData_spin"></div></h3>
+		<h3><span class="check" id="saves_check">&#10003;</span><span class="x" id="saves_x">&times;</span>Saves<div class="loader" id="saves_spin"></div></h3>
+		<h3><span class="check" id="ckan_check">&#10003;</span><span class="x" id="ckan_x">&times;</span>CKAN<div class="loader" id="ckan_spin"></div></h3>
 	</div>
 
 
