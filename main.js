@@ -2,6 +2,8 @@ const {app, BrowserWindow, ipcMain} = require("electron");
 const fs = require("fs");
 const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
+const ncp = require("ncp")
+const rimraf = require("rimraf")
 
 //Check if path leads to directory
 function isDirectory(source){
@@ -38,7 +40,8 @@ var path = app.getPath('userData')
 console.log(path+"\\config.json");
 
 //Load config
-fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
+if(fs.existsSync(path+"\\config.json")){
+  fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
   try{
     var data = JSON.parse(buf.toString());
     config=data;
@@ -51,6 +54,7 @@ fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
     });
   }
 });
+}
 
 console.log(config["profile"]["profiles"][config["profile"]["selected"]])
 
@@ -98,7 +102,11 @@ var window;
 
 app.on('ready', function(){
   window = new BrowserWindow({width:640, height:480, frame: false})
-  window.loadFile("index.html")
+  if(fs.existsSync(path+'\\config.json'))
+    window.loadFile("index.html")
+  else
+    window.loadFile("setup.html")
+
 })
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
@@ -120,6 +128,66 @@ ipcMain.on('window-close', function(){
   console.log("close");
   window.close();
 });
+
+//Initial configuration
+ipcMain.on('initialize', function(event, data){
+  data=JSON.parse(data)
+  config = {
+    "mode":data["mode"],
+    "version":data["version"],
+    "path":data["path"],
+    "profile":{
+      "selected":0,
+      "profiles":[data["profile"]]
+    }
+  };
+
+  console.log(config);
+
+  saveConfig();
+
+  //Gat path of KSP directory
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+
+  var profilePath = path+"\\profiles\\"+data["profile"];
+
+  fs.mkdirSync(path+"\\profiles")
+  fs.mkdirSync(profilePath)
+
+
+  if(!fs.existsSync(location+"\\CKAN")){
+    fs.mkdirSync(profilePath+"\\CKAN")
+    fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+    event.sender.send("ckan-complete");
+  } else{
+    ncp(location+"\\CKAN", profilePath+"\\CKAN", function(err){
+      console.log(fs.existsSync(profilePath+"\\CKAN"))
+      console.log(profilePath+"\\CKAN"+"<-"+location+"\\CKAN")
+      rimraf.sync(location+"\\CKAN");
+      // fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+      event.sender.send("ckan-complete");
+    })
+  }
+  ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
+    console.log(fs.existsSync(profilePath+"\\GameData"))
+    console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
+    rimraf.sync(location+"\\GameData");
+    // fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
+    event.sender.send("gamedata-complete");
+  })
+  ncp(location+"\\saves", profilePath+"\\saves", function(err){
+    console.log(fs.existsSync(profilePath+"\\saves"))
+    console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
+    rimraf.sync(location+"\\saves");
+    // fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
+    event.sender.send("saves-complete");
+  })
+})
+
+ipcMain.on("finish-init", function(){
+  console.log("FINISHED")
+  window.loadFile("index.html")
+})
 
 //Launch KSP
 ipcMain.on("window-launch", function(){

@@ -1,0 +1,158 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<script>
+	const {ipcRenderer} = require('electron')
+
+	console.log("INIT");
+
+	var stepsComplete = 0;
+
+	"Basic window functions"
+		function win_close(){
+		  ipcRenderer.send('window-close');
+		}
+		function win_max() {
+		  ipcRenderer.send('window-max');
+		}
+		function win_min() {
+		  ipcRenderer.send('window-min');
+		}
+	//-----------------------
+
+	//Set to automatic path input mode
+	function steamMode(){
+	  document.getElementById("ksp_path").disabled=true;
+	  document.getElementById("exeVersion").style.display='inline';
+	}
+
+	//Set to manual path input mode
+	function manualMode(){
+	  document.getElementById("ksp_path").disabled=false;
+	  document.getElementById("exeVersion").style.display='none';
+	}
+	//Set path to EXE (steam mode)
+	function setExe(exe){
+	  document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
+	}
+
+	function submit(){
+	  var mode = "";
+	  var version = "";
+
+	  //Get mode
+	  if(document.getElementById("installation_steam").checked)
+	    mode="steam";
+	  else
+	    mode='manual';
+
+	  //Get EXE version
+	  if(document.getElementById("version_64").checked)
+	    version="64";
+	  else
+	    version="32";
+
+	  var path = document.getElementById("ksp_path").value;
+
+	  var profileName = document.getElementById("profile_name").value;
+
+    var data = {
+	    "mode":mode,
+	    "version":version,
+	    "path":path,
+	    "profile":profileName
+	  }
+
+    ipcRenderer.send("initialize", JSON.stringify(data));
+
+    document.getElementById("setup").style.display="none";
+	  document.getElementById("progress").style.display="block";
+	}
+
+	ipcRenderer.on("ckan-complete", function(){
+	  document.getElementById("ckan_spin").style.display="none";
+	  document.getElementById("ckan_check").style.display="block";
+		stepsComplete++;
+		checkSteps();
+	})
+
+	ipcRenderer.on("gamedata-complete", function(){
+	  document.getElementById("gameData_spin").style.display="none";
+	  document.getElementById("gameData_check").style.display="block";
+		stepsComplete++;
+		checkSteps();
+	})
+
+	ipcRenderer.on("saves-complete", function(){
+	  document.getElementById("saves_spin").style.display="none";
+	  document.getElementById("saves_check").style.display="block";
+		stepsComplete++;
+		checkSteps();
+	})
+
+	function checkSteps(){
+		if(stepsComplete==3){
+			ipcRenderer.send("finish-init")
+		}
+	}
+
+
+</script>
+<body style="color:white">
+	<header>
+		<a class="close" id="close" onclick="win_close()">&times;</a>
+		<a class="close" id="max" onclick="win_max()">&square;</a>
+		<a class="close" id="min" onclick="win_min()">&#95;</a>
+	</header>
+	<div id="setup" style="display:block">
+		<div id="installMode">
+			<h2>KSP executable path</h2>
+			Installion mode:
+			<label class="container">Steam
+				<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
+				<span class="checkmark"></span>
+			</label>
+			<label class="container">Manual
+				<input type="radio" name="mode" onchange="manualMode()" id="installation_manual">
+				<span class="checkmark"></span>
+			</label>
+		</div>
+
+		<!-- EXE version selection -->
+		<div id="exeVersion" style="display:inline">
+			<br/>
+			Exe version:
+			<label class="container">64 bit
+				<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')" id="version_64">
+				<span class="checkmark"></span>
+			</label>
+			<label class="container">32 bit
+				<input type="radio" name="exeVersion" onchange="setExe('KSP')" id="version_32">
+				<span class="checkmark"></span>
+			</label>
+		</div>
+
+		<!-- Path input/display -->
+		<p>
+			Path:
+			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
+		</p>
+
+		<br/>
+		<div>
+			<h2>Initial profile</h2>
+			Name: <input type="text" class="text" id="profile_name" value="First profile"></input>
+
+		</div>
+		<br/>
+		<a class="load" style="float:left" onclick="submit()">Confirm</a>
+	</div>
+	<div id="progress" style="display:none">
+		<h1>Progress</h1>
+		<h3><span class="check" id="gameData_check">&#10003; </span>GameData<div class="loader"  id="gameData_spin"></div></h3>
+		<h3><span class="check" id="saves_check">&#10003; </span>Saves<div class="loader" id="saves_spin"></div></h3>
+		<h3><span class="check" id="ckan_check">&#10003; </span>CKAN<div class="loader" id="ckan_spin"></div></h3>
+	</div>
+
+
+
+</body>
