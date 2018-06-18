@@ -161,26 +161,35 @@ ipcMain.on('initialize', function(event, data){
     event.sender.send("ckan-complete");
   } else{
     ncp(location+"\\CKAN", profilePath+"\\CKAN", function(err){
-      console.log(fs.existsSync(profilePath+"\\CKAN"))
-      console.log(profilePath+"\\CKAN"+"<-"+location+"\\CKAN")
-      rimraf.sync(location+"\\CKAN");
-      // fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-      event.sender.send("ckan-complete");
+      // console.log(fs.existsSync(profilePath+"\\CKAN"))
+      // console.log(profilePath+"\\CKAN"+"<-"+location+"\\CKAN")
+	  console.log("CKAN COPIED")
+      rimraf(location+"\\CKAN", [], function(){
+		console.log("CKAN DELETED")
+		fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+		event.sender.send("ckan-complete");
+	  });
     })
   }
   ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
-    console.log(fs.existsSync(profilePath+"\\GameData"))
-    console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
-    rimraf.sync(location+"\\GameData");
-    // fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
-    event.sender.send("gamedata-complete");
+    // console.log(fs.existsSync(profilePath+"\\GameData"))
+    // console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
+	  console.log("GameData COPIED")
+	rimraf(location+"\\GameData", [],  function(){
+		console.log("GameData DELETED")
+		fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
+		event.sender.send("gamedata-complete");
+	});
   })
   ncp(location+"\\saves", profilePath+"\\saves", function(err){
-    console.log(fs.existsSync(profilePath+"\\saves"))
-    console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
-    rimraf.sync(location+"\\saves");
-    // fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
-    event.sender.send("saves-complete");
+    // console.log(fs.existsSync(profilePath+"\\saves"))
+    // console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
+	  console.log("CKAN COPIED")
+    rimraf(location+"\\saves", [],  function(){
+		console.log("saves DELETED")
+	    fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
+		event.sender.send("saves-complete");
+	});
   })
 })
 
