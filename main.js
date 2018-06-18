@@ -263,8 +263,8 @@ ipcMain.on("get-saves", function(event){
     }
     //Get flights not marked as Debris or Probe
     var flights = ""+data.match(/VESSEL\n.*\n.*\n.*\n.*\n\t*type = [^D|F]/g).length
-
-    //Add JSON to saves
+	
+	//Add JSON to saves
     saves.push({
       "name":title,
       "mode":mode,
