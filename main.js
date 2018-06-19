@@ -4,6 +4,7 @@ const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
 const ncp = require("ncp")
 const rimraf = require("rimraf")
+const sleep  = require("sleep-async")();
 
 //Check if path leads to directory
 function isDirectory(source){
@@ -42,18 +43,18 @@ console.log(path+"\\config.json");
 //Load config
 if(fs.existsSync(path+"\\config.json")){
   fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
-  try{
-    var data = JSON.parse(buf.toString());
-    config=data;
-    console.log(config)
-  } catch(e){
-    console.log("Config not found, reverting to default")
-    fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
-      if (err) console.log(err);
-      console.log("Successfully Written to File.");
-    });
-  }
-});
+    try{
+      var data = JSON.parse(buf.toString());
+      config=data;
+      console.log(config)
+    } catch(e){
+      console.log("Config not found, reverting to default")
+      fs.writeFile(path+'\\config.json', JSON.stringify(config), function(err, data){
+        if (err) console.log(err);
+        console.log("Successfully Written to File.");
+      });
+    }
+  });
 }
 
 console.log(config["profile"]["profiles"][config["profile"]["selected"]])
@@ -103,14 +104,14 @@ var window;
 app.on('ready', function(){
   window = new BrowserWindow({width:640, height:480, frame: false})
   if(fs.existsSync(path+'\\config.json'))
-    window.loadFile("index.html")
+  window.loadFile("index.html")
   else
-    window.loadFile("setup.html")
+  window.loadFile("setup.html")
 
 })
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  window.toggleDevTools();
+  // window.toggleDevTools();
 });
 
 //IPC window functions
@@ -168,12 +169,11 @@ ipcMain.on('initialize', function(event, data){
         event.sender.send("failed", "ckan");
         return;
       }
-	    console.log("CKAN COPIED")
+      console.log("CKAN COPIED")
       rimraf(location+"\\CKAN", [], function(){
-    		console.log("CKAN DELETED")
-    		fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-    		event.sender.send("complete", "ckan");
-  	  });
+        console.log("CKAN DELETED")
+        event.sender.send("complete", "ckan");
+      });
     })
   }
   ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
@@ -181,36 +181,55 @@ ipcMain.on('initialize', function(event, data){
     // console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
     if(err){
       console.log("GameData FAILED")
-  		event.sender.send("failed", "gameData");
+      event.sender.send("failed", "gameData");
       return;
     }
-	  console.log("GameData COPIED")
-  	rimraf(location+"\\GameData", [],  function(){
-  		console.log("GameData DELETED")
-  		fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
-  		event.sender.send("complete", "gameData");
-  	});
+    console.log("GameData COPIED")
+    rimraf(location+"\\GameData", [],  function(){
+      console.log("GameData DELETED")
+      event.sender.send("complete", "gameData");
+    });
   })
   ncp(location+"\\saves", profilePath+"\\saves", function(err){
     // console.log(fs.existsSync(profilePath+"\\saves"))
     // console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
     if(err){
       console.log("saves FAILED")
-  		event.sender.send("failed", "saves");
+      event.sender.send("failed", "saves");
       return;
     }
-	  console.log("CKAN COPIED")
+    console.log("saves COPIED")
     rimraf(location+"\\saves", [],  function(){
-  		console.log("saves DELETED")
-	    fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
-  		event.sender.send("complete", "saves");
-	   });
+      console.log("saves DELETED")
+      event.sender.send("complete", "saves");
+    });
   })
 })
 
 ipcMain.on("finish-init", function(){
-  console.log("FINISHED")
-  window.loadFile("index.html")
+  //Gat path of KSP directory
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+
+  var profilePath = path+"\\profiles\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  sleep.sleep(5000, function(){
+    try{
+      fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
+    }catch (err){
+      console.log("GameData symlink failed")
+    }
+    try{
+      fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
+    } catch(err){
+      console.log("saves symlink failed")
+    }
+    try{
+      fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+    } catch(err){
+      console.log("CKAN symlink failed")
+    }
+    console.log("FINISHED")
+    window.loadFile("index.html")
+  });
 })
 
 //Launch KSP
@@ -279,7 +298,7 @@ ipcMain.on("get-saves", function(event){
     //Get flights not marked as Debris or Probe
     var flights = ""+data.match(/VESSEL\n.*\n.*\n.*\n.*\n\t*type = [^D|F]/g).length
 
-	//Add JSON to saves
+    //Add JSON to saves
     saves.push({
       "name":title,
       "mode":mode,
