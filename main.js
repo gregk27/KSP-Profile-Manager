@@ -103,12 +103,14 @@ var window;
 
 app.on('ready', function(){
   window = new BrowserWindow({width:640, height:480, frame: false})
+  //If the config file doesn't exist, run install tool
   if(fs.existsSync(path+'\\config.json'))
-  window.loadFile("index.html")
+    window.loadFile("index.html")
   else
-  window.loadFile("setup.html")
+    window.loadFile("setup.html")
 
 })
+
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
   // window.toggleDevTools();
@@ -132,6 +134,7 @@ ipcMain.on('window-close', function(){
 
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
+  //Get config from send data
   data=JSON.parse(data)
   config = {
     "mode":data["mode"],
@@ -145,89 +148,112 @@ ipcMain.on('initialize', function(event, data){
 
   console.log(config);
 
+  //Save the config
   saveConfig();
 
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
+  //Get path to profile saves
   var profilePath = path+"\\profiles\\"+data["profile"];
 
+  //Create profile foledr
   fs.mkdirSync(path+"\\profiles")
   fs.mkdirSync(profilePath)
 
-
+  //If there isn't a CKAN folder in the KSP directory, create an empty one in the profile
   if(!fs.existsSync(location+"\\CKAN")){
     fs.mkdirSync(profilePath+"\\CKAN")
     fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+    //Mark as complete
     event.sender.send("complete", "ckan");
   } else{
+    //Copy folder to profile
     ncp(location+"\\CKAN", profilePath+"\\CKAN", function(err){
-      // console.log(fs.existsSync(profilePath+"\\CKAN"))
-      // console.log(profilePath+"\\CKAN"+"<-"+location+"\\CKAN")
+      //Catch failure
       if(err){
         console.log("CKAN FAILED")
+        //Mark as failed
         event.sender.send("failed", "ckan");
         return;
       }
+      //Otherwise announce completion
       console.log("CKAN COPIED")
+      //Delete folder in KSP directory
       rimraf(location+"\\CKAN", [], function(){
         console.log("CKAN DELETED")
+        //Mark as complete
         event.sender.send("complete", "ckan");
       });
     })
   }
+  //Copy folder to profile
   ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
-    // console.log(fs.existsSync(profilePath+"\\GameData"))
-    // console.log(profilePath+"\\GameData"+"<-"+location+"\\GameData")
+    //Catch failure
     if(err){
       console.log("GameData FAILED")
+      //Mark as failed
       event.sender.send("failed", "gameData");
       return;
     }
+    //Otherwise announce completion
     console.log("GameData COPIED")
+    //Delete folder in KSP directory
     rimraf(location+"\\GameData", [],  function(){
       console.log("GameData DELETED")
+      //Mark as complete
       event.sender.send("complete", "gameData");
     });
   })
+  //Copy folder to profile
   ncp(location+"\\saves", profilePath+"\\saves", function(err){
-    // console.log(fs.existsSync(profilePath+"\\saves"))
-    // console.log(profilePath+"\\saves"+"<-"+location+"\\saves")
+    //Catch failure
     if(err){
       console.log("saves FAILED")
+      //Mark as failed
       event.sender.send("failed", "saves");
       return;
     }
+    //Otherwise announce completion
     console.log("saves COPIED")
+    //Delete folder in KSP directory
     rimraf(location+"\\saves", [],  function(){
       console.log("saves DELETED")
+      //Mark as complete
       event.sender.send("complete", "saves");
     });
   })
 })
 
+//Create symlinks to the new profile folders
 ipcMain.on("finish-init", function(){
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
   var profilePath = path+"\\profiles\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+
+  //Wait for 5 seconds to avoid access denied error
   sleep.sleep(5000, function(){
+    //Create GameData symlink
     try{
       fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
     }catch (err){
       console.log("GameData symlink failed")
     }
+    //Create saves symlink
     try{
       fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
     } catch(err){
       console.log("saves symlink failed")
     }
+    //Create CKAN symlink
     try{
       fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
     } catch(err){
       console.log("CKAN symlink failed")
     }
     console.log("FINISHED")
+    //Load main window to complete installation
     window.loadFile("index.html")
   });
 })

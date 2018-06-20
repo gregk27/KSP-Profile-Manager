@@ -62,24 +62,31 @@
 	    "profile":profileName
 	  }
 
+		//Send data to backend
     ipcRenderer.send("initialize", JSON.stringify(data));
 
+		//Show progress menu
     document.getElementById("setup").style.display="none";
 	  document.getElementById("progress").style.display="block";
 	}
 
+	//Switch from progress circle to checkmark
 	ipcRenderer.on("complete", function(e, target){
 	  document.getElementById(target+"_spin").style.display="none";
 	  document.getElementById(target+"_check").style.display="block";
+		//Mark step as complete
 		stepsComplete++;
+		//Check if other steps are complete
 		checkSteps();
 	})
 
+	//Switch from progress circle to X
 	ipcRenderer.on("failed", function(e, target){
 		document.getElementById(target+"_spin").style.display="none";
 		document.getElementById(target+"_x").style.display="block";
 	})
 
+	//check to see if all 3 steps have been succesfully completed
 	function checkSteps(){
 		if(stepsComplete==3){
 			ipcRenderer.send("finish-init")
@@ -97,7 +104,7 @@
 	<div id="setup" style="display:block">
 		<div id="installMode">
 			<h2>KSP executable path</h2>
-			Installation mode:
+			Installion mode:
 			<label class="container">Steam
 				<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
 				<span class="checkmark"></span>
@@ -135,7 +142,7 @@
 
 		</div>
 		<br/>
-		<p>Back up your saves and mods before continuing in case of rapid unplanned disassembly</p>
+		<p>Back up your saves and mods before continuing in case of unplanned rapid disassembly</p>
 
 		<br/>
 		<a class="load" style="float:left" onclick="submit()">Confirm</a>
@@ -147,8 +154,8 @@
 		<h3><span class="check" id="ckan_check">&#10003;</span><span class="x" id="ckan_x">&times;</span>CKAN<div class="loader" id="ckan_spin"></div></h3>
 		<h3><span class="check" id="link_check">&#10003;</span><span class="x" id="link_x">&times;</span>Symlinks<div class="loader" id="link_spin"></div></h3>
 
-		<p>This process may take some time, depending on the amount of mods and saves you have installed</p>
-		<!-- <p>If your mods and saves don't appear when the installation is complete, press load to reload the profile</p> -->
+		<p>This process may take some time, depending on the amount of modds and saves you have installed</p>
+		<!-- <p>If your mods and saves dont appear when the installation is complete, press load to reaload the profile</p> -->
 
 	</div>
 
