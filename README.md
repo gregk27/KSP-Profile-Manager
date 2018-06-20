@@ -1,7 +1,12 @@
 # KSP Profile Manager
 A software utility to simplify the managing of Kerbal Space Program mod profiles.
 
-This software allows users to have multiple KSP profiles with seperate mod&savegame folders
+Each profile has it's own:
+  - Saves folder
+  - GameData folder
+  - CKAN folder
+  
+This allows you to have one set of mods for your career, and a seperate set of mods for your sandbox.
 
 # Installation
 Installation is easy!
