@@ -13,7 +13,7 @@ Installation is easy!
 
 Step 1: Get the [newest release](https://github.com/Aree-Vanier/KSP-Profile-Manager/releases)
 
-Step 2: **BACK UP YOUR SAVES** (and possilby mods). While it shouldn't happen, saves may be damaged by the install process
+Step 2: **BACK UP YOUR SAVES** (and possibly mods). While it shouldn't happen, saves may be damaged by the install process
 
 Step 3: Run `KSP-Profile-Manager.exe`
 
