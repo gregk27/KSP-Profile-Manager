@@ -19,7 +19,7 @@ Step 3: Run `KSP-Profile-Manager.exe`
 
 Step 4: Enter the required information on the installation page
 
-!(https://steemitimages.com/0x0/https://cdn.steemitimages.com/DQmeTG5cqBdaDfaCnVYn2kUevefP8LyA46qdDpi4qZt3KHs/image.png "Install page")
+![Install page](https://steemitimages.com/0x0/https://cdn.steemitimages.com/DQmeTG5cqBdaDfaCnVYn2kUevefP8LyA46qdDpi4qZt3KHs/image.png "Install page")
 
 Step 5: Wait for the installation process. This may take some time as it has to copy all mods and saves.
 
