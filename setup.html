@@ -88,7 +88,7 @@
 
 	//check to see if all 3 steps have been succesfully completed
 	function checkSteps(){
-		if(stepsComplete==3){
+		if(stepsComplete==5){
 			ipcRenderer.send("finish-init")
 		}
 	}
@@ -152,6 +152,9 @@
 		<h3><span class="check" id="gameData_check">&#10003;</span><span class="x" id="gameData_x">&times;</span>GameData<div class="loader"  id="gameData_spin"></div></h3>
 		<h3><span class="check" id="saves_check">&#10003;</span><span class="x" id="saves_x">&times;</span>Saves<div class="loader" id="saves_spin"></div></h3>
 		<h3><span class="check" id="ckan_check">&#10003;</span><span class="x" id="ckan_x">&times;</span>CKAN<div class="loader" id="ckan_spin"></div></h3>
+		<h3><span class="check" id="squad_check">&#10003;</span><span class="x" id="squad_x">&times;</span>Stock Parts<div class="loader" id="squad_spin"></div></h3>
+		<h3><span class="check" id="dlc_check">&#10003;</span><span class="x" id="dlc_x">&times;</span>DLC<div class="loader" id="dlc_spin"></div></h3>
+
 		<h3><span class="check" id="link_check">&#10003;</span><span class="x" id="link_x">&times;</span>Symlinks<div class="loader" id="link_spin"></div></h3>
 
 		<p>This process may take some time, depending on the amount of modds and saves you have installed</p>

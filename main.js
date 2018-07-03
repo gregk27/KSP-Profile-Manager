@@ -134,6 +134,9 @@ ipcMain.on('window-close', function(){
 
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
+
+  var version = "1_4_1"
+
   //Get config from send data
   data=JSON.parse(data)
   config = {
@@ -154,11 +157,16 @@ ipcMain.on('initialize', function(event, data){
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
+
+
   //Get path to profile saves
-  var profilePath = path+"\\profiles\\"+data["profile"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+data["profile"];
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   //Create profile foledr
   fs.mkdirSync(path+"\\profiles")
+  fs.mkdirSync(path+"\\profiles\\"+version)
+  fs.mkdirSync(stockPath)
   fs.mkdirSync(profilePath)
 
   //If there isn't a CKAN folder in the KSP directory, create an empty one in the profile
@@ -194,8 +202,46 @@ ipcMain.on('initialize', function(event, data){
       console.log("GameData FAILED")
       //Mark as failed
       event.sender.send("failed", "gameData");
+      event.sender.send("failed", "stock");
+      event.sender.send("failed", "dlc");
       return;
     }
+
+    //Copy squad folder
+    ncp(profilePath+"\\GameData\\Squad", stockPath+"\\Squad", function(err){
+      if(!err){
+        rimraf(profilePath+"\\GameData\\Squad", [], function(){
+          console.log("Stock DELETED")
+          //Mark as complete
+          event.sender.send("complete", "squad");
+        })
+      }
+      else {
+        event.sender.send("failed", "squad");
+      }
+    });
+
+    //Copy DLC folders
+    if(fs.existsSync(profilePath+"\\GameData\\SquadExpansion")){
+      ncp(profilePath+"\\GameData\\SquadExpansion", stockPath+"\\SquadExpansion", function(err){
+        if(!err){
+          rimraf(profilePath+"\\GameData\\SquadExpansion", [], function(){
+            console.log("DLC DELETED")
+            //Mark as complete
+            event.sender.send("complete", "dlc");
+          })
+        }
+        else {
+          event.sender.send("failed", "dlc");
+        }
+      });
+    }
+    else{
+      fs.mkdirSync(profilePath+"\\GameData\\SquadExpansion");
+      event.sender.send("complete", "dlc");
+    }
+
+
     //Otherwise announce completion
     console.log("GameData COPIED")
     //Delete folder in KSP directory
@@ -232,6 +278,11 @@ ipcMain.on("finish-init", function(){
 
   var profilePath = path+"\\profiles\\"+config["profile"]["profiles"][config["profile"]["selected"]];
 
+  var version = "1_4_1"
+
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
+
+
   //Wait for 5 seconds to avoid access denied error
   sleep.sleep(5000, function(){
     //Create GameData symlink
@@ -251,6 +302,16 @@ ipcMain.on("finish-init", function(){
       fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
     } catch(err){
       console.log("CKAN symlink failed")
+    }
+    try{
+      fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\Squad", "junction");
+    } catch(err){
+      console.log("Squad symlink failed")
+    }
+    try{
+      fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\SquadExpansion", "junction");
+    } catch(err){
+      console.log("SquadExpansion symlink failed")
     }
     console.log("FINISHED")
     //Load main window to complete installation
