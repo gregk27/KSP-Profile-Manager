@@ -1,20 +1,25 @@
 # KSP Profile Manager
 A software utility to simplify the managing of Kerbal Space Program mod profiles.
 
-This software allows users to have multiple KSP profiles with seperate mod&savegame folders
+Each profile has it's own:
+  - Saves folder
+  - GameData folder
+  - CKAN folder
+  
+This allows you to have one set of mods for your career, and a seperate set of mods for your sandbox.
 
 # Installation
 Installation is easy!
 
 Step 1: Get the [newest release](https://github.com/Aree-Vanier/KSP-Profile-Manager/releases)
 
-Step 2: **BACK UP YOUR SAVES** (and possilby mods). While it shouldn't happen, saves may be damaged by the install process
+Step 2: **BACK UP YOUR SAVES** (and possibly mods). While it shouldn't happen, saves may be damaged by the install process
 
 Step 3: Run `KSP-Profile-Manager.exe`
 
 Step 4: Enter the required information on the installation page
 
-[IMAGE OF INSTALL PAGE]
+![Install page](https://steemitimages.com/0x0/https://cdn.steemitimages.com/DQmeTG5cqBdaDfaCnVYn2kUevefP8LyA46qdDpi4qZt3KHs/image.png "Install page")
 
 Step 5: Wait for the installation process. This may take some time as it has to copy all mods and saves.
 
@@ -40,6 +45,9 @@ There should be no mod conflicts, as no mods run outside of the KSP environment.
 There is currently no proper support for KSP updates, however adding support is a high priority.
 
 There is currently only support for windows computers, because I have no means of testing on a mac, and have not yet tested on linux.
+
+# Reporting bugs
+This is still in a developmental phase. If you encouter any error, or have any suggestions, please [create an issue](https://github.com/Aree-Vanier/KSP-Profile-Manager/issues) so that I can improve the software.
 
 # How it works
 The software creates a symlink between a profile folder and the KSP install directory. This symlink causes windows to treat the remote folder as if it is in the KSP directory, allowing KSP (as well as CKAN) to run normally.
