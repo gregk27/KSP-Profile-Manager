@@ -36,6 +36,7 @@ var config = {
   }
 };
 
+
 var path = app.getPath('userData')
 
 console.log(path+"\\config.json");
@@ -135,19 +136,21 @@ ipcMain.on('window-close', function(){
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
 
-  var version = "1_4_1"
 
   //Get config from send data
   data=JSON.parse(data)
   config = {
     "mode":data["mode"],
-    "version":data["version"],
+    "version":data["exe"],
     "path":data["path"],
     "profile":{
       "selected":0,
       "profiles":[data["profile"]]
+      "versions":[data["version"]]
     }
   };
+
+  var version = data["version"]
 
   console.log(config);
 
@@ -405,15 +408,15 @@ ipcMain.on("get-profiles", function(event){
 })
 
 //Create new profile
-ipcMain.on("create-profile", function(event, arg){
+ipcMain.on("create-profile", function(event, arg, version){
   //Add profile
   config["profile"]["profiles"].push(arg)
+  config["profile"]["versions"].push(version)
   //Select profile
   config["profile"]["selected"] = config["profile"]["profiles"].length-1;
   //Update config save
   saveConfig();
   //Create new folders
-  var version = "1_4_1"
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
   console.log(profilePath);
@@ -437,8 +440,9 @@ ipcMain.on("change-profile", function(event,arg){
   fs.rmdirSync(location+"\\GameData")
   fs.rmdirSync(location+"\\CKAN")
   //Create new links
-  var version = "1_4_1"
+  var version = config["versions"]["selected"]
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+
   fs.symlinkSync(profilePath+"\\saves", location+"\\saves", 'junction');
   fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
   fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");

@@ -225,7 +225,7 @@
 		function createProfile(){
 			//Get name
 			var name = document.getElementById("new_profile_name").value;
-			ipcRenderer.send("create-profile", name);
+			ipcRenderer.send("create-profile", name, "1_4_1");
 			//Close overlay
 			newProfileOverlay(false);
 		}
@@ -235,7 +235,7 @@
 		getProfiles();
 	})
 	//-----------------------
-	
+
 	"Rename Profile"
 		function renameProfile(newName){
 			ipcRenderer.send("rename-profile", document.getElementById("profiles").value, document.getElementById("changed_profile_name").value)
