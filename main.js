@@ -355,7 +355,7 @@ ipcMain.on("get-saves", function(event){
 
   for(var i=0; i<saveDirs.length; i++){
     //Ignore sceanrio and training folders
-    if(saveDirs[i].endsWith("scenarios")||saveDirs[i].endsWith("training")||saveDirs[i].endsWith("mission")) continue;
+    if(saveDirs[i].endsWith("scenarios")||saveDirs[i].endsWith("training")||saveDirs[i].endsWith("missions")) continue;
 
     //Read save file
     var data = fs.readFileSync(saveDirs[i]+"\\persistent.sfs", "utf-8").replace(/\r/g, "").replace(/\\/g, "\\\\");
@@ -413,11 +413,18 @@ ipcMain.on("create-profile", function(event, arg){
   //Update config save
   saveConfig();
   //Create new folders
-  console.log(path+"\\profiles\\"+arg);
-  fs.mkdirSync(path+"\\profiles\\"+arg);
-  fs.mkdirSync(path+"\\profiles\\"+arg+"\\GameData");
-  fs.mkdirSync(path+"\\profiles\\"+arg+"\\saves");
-  fs.mkdirSync(path+"\\profiles\\"+arg+"\\CKAN");
+  var version = "1_4_1"
+  var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
+  console.log(profilePath);
+  fs.mkdirSync(profilePath);
+  fs.mkdirSync(profilePath+"\\GameData");
+  fs.mkdirSync(profilePath+"\\saves");
+  fs.mkdirSync(profilePath+"\\CKAN");
+
+  fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
+  fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\GameData\\SquadExpansion", "junction");
+
   event.sender.send("new-profile-created");
 })
 
