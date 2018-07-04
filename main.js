@@ -269,7 +269,7 @@ ipcMain.on('initialize', function(event, data){
     rimraf(location+"\\saves", [],  function(){
       console.log("saves DELETED")
       //Mark as complete
-      // event.sender.send("complete", "saves");
+      event.sender.send("complete", "saves");
     });
   })
 })
