@@ -94,6 +94,23 @@
 		}
 	}
 
+	ipcRenderer.on("error", function(e, code){
+			var current = document.getElementById("errors").innerHTML;
+			if(current == ""){
+				document.getElementById("errors").innerHTML = "Error code: "+code;
+			}
+			else{
+				document.getElementById("errors").innerHTML = current+", "+code;
+			}
+	})
+
+	ipcRenderer.on("finished-init", function(){
+			document.getElementById("finish").style.display = "block"
+	})
+
+	function finish(){
+		ipcRenderer.send("finished-init")
+	}
 
 </script>
 <body style="color:white">
@@ -102,7 +119,7 @@
 		<a class="close" id="max" onclick="win_max()">&square;</a>
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
-	<div id="setup" style="display:block">
+	<div id="setup" style="display:block; padding-left:15px">
 		<div id="installMode">
 			<h2>KSP executable path</h2>
 			Installion mode:
@@ -160,6 +177,8 @@
 
 		<p>This process may take some time, depending on the amount of mods and saves you have installed</p>
 		<!-- <p>If your mods and saves dont appear when the installation is complete, press load to reaload the profile</p> -->
+
+      <a class="load" style="display:none; width:70%" onclick="finish()" id="finish">Continue</a><h3 id="errors"></h3>
 
 	</div>
 
