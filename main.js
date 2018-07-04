@@ -276,9 +276,9 @@ ipcMain.on("finish-init", function(){
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
-  var profilePath = path+"\\profiles\\"+config["profile"]["profiles"][config["profile"]["selected"]];
-
   var version = "1_4_1"
+
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
 
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
@@ -355,7 +355,7 @@ ipcMain.on("get-saves", function(event){
 
   for(var i=0; i<saveDirs.length; i++){
     //Ignore sceanrio and training folders
-    if(saveDirs[i].endsWith("scenarios")||saveDirs[i].endsWith("training")) continue;
+    if(saveDirs[i].endsWith("scenarios")||saveDirs[i].endsWith("training")||saveDirs[i].endsWith("mission")) continue;
 
     //Read save file
     var data = fs.readFileSync(saveDirs[i]+"\\persistent.sfs", "utf-8").replace(/\r/g, "").replace(/\\/g, "\\\\");
@@ -430,9 +430,11 @@ ipcMain.on("change-profile", function(event,arg){
   fs.rmdirSync(location+"\\GameData")
   fs.rmdirSync(location+"\\CKAN")
   //Create new links
-  fs.symlinkSync(path+"\\profiles\\"+arg+"\\saves", location+"\\saves", 'junction');
-  fs.symlinkSync(path+"\\profiles\\"+arg+"\\GameData", location+"\\GameData", "junction");
-  fs.symlinkSync(path+"\\profiles\\"+arg+"\\CKAN", location+"\\CKAN", "junction");
+  var version = "1_4_1"
+  var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+  fs.symlinkSync(profilePath+"\\saves", location+"\\saves", 'junction');
+  fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
+  fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
   event.sender.send("refresh");
 })
 
