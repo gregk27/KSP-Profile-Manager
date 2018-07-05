@@ -114,7 +114,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  // window.toggleDevTools();
+  window.toggleDevTools();
 });
 
 //IPC window functions
@@ -290,9 +290,7 @@ ipcMain.on("finish-init", function(event){
   sleep.sleep(10000, function(){
     //Create GameData symlink
     try{
-      console.log(location+"\\GameData\t"+profilePath+"\\GameData")
-      console.log(fs.existsSync(location+"\\GameData"))
-      // fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
+      fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
     }catch (err){
       console.log("GameData symlink failed")
       event.sender.send("failed", "link");
@@ -477,6 +475,11 @@ ipcMain.on("rename-profile", function(event, oldName, newName){
   fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
   event.sender.send("profile-renamed", newName);
 })
+
+ipcMain.on("get-versions", function(event){
+  var data =getDirectories(path+"\\profiles").replace(/_/g, ".").split(";");
+  event.sender.send("get-versions", data.splice(0, data.length-1))
+});
 
 //Saves to config to file
 function saveConfig(){
