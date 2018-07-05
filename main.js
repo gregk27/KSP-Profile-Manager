@@ -135,8 +135,6 @@ ipcMain.on('window-close', function(){
 
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
-
-
   //Get config from send data
   data=JSON.parse(data)
   config = {
@@ -159,8 +157,6 @@ ipcMain.on('initialize', function(event, data){
 
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
-
-
 
   //Get path to profile saves
   var profilePath = path+"\\profiles\\"+version+"\\"+data["profile"];
@@ -487,4 +483,51 @@ function saveConfig(){
     if (err) console.log(err);
     console.log("Successfully Written to File.");
   });
+}
+
+function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
+
+  //Gat path of KSP directory
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+
+  //Get path to profile saves
+  var profilePath = path+"\\profiles\\"+version+"\\"+data["profile"];
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
+
+  oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+  newPath = newPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+
+  //Check if the old path exists
+  if(!fs.existsSync(oldPath)){
+    //If the old path doesnt exist, only make new path
+    fs.mkdirSync(newPath)
+    // fs.symlinkSync(newPath, oldPath, "junction");
+    //Mark as complete
+    event.sender.send("complete", tag);
+  } else{
+    //Copy folder to profile
+    ncp(oldPath, newPath, function(err){
+      //Catch failure
+      if(err){
+        console.log(tag+" FAILED")
+        //Mark as failed
+        renderer.send("failed", tag);
+        return;
+      }
+      //Otherwise announce completion
+      console.log(tag+" COPIED")
+      for(var i = 0; i<dependents.length; i++){
+        var folder = dependents[i];
+        moveFolder(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], version, renderer)
+      }
+
+      //Delete folder in KSP directory
+      rimraf(oldPath, [], function(){
+        console.log(tag+" DELETED")
+        //Mark as complete
+        renderer.send("complete", tag);
+      });
+    })
+    }
+  }
 }
