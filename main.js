@@ -168,106 +168,13 @@ ipcMain.on('initialize', function(event, data){
   fs.mkdirSync(stockPath)
   fs.mkdirSync(profilePath)
 
-  //If there isn't a CKAN folder in the KSP directory, create an empty one in the profile
-  if(!fs.existsSync(location+"\\CKAN")){
-    fs.mkdirSync(profilePath+"\\CKAN")
-    fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-    //Mark as complete
-    event.sender.send("complete", "ckan");
-  } else{
-    //Copy folder to profile
-    ncp(location+"\\CKAN", profilePath+"\\CKAN", function(err){
-      //Catch failure
-      if(err){
-        console.log("CKAN FAILED")
-        //Mark as failed
-        event.sender.send("failed", "ckan");
-        return;
-      }
-      //Otherwise announce completion
-      console.log("CKAN COPIED")
-      //Delete folder in KSP directory
-      rimraf(location+"\\CKAN", [], function(){
-        console.log("CKAN DELETED")
-        //Mark as complete
-        event.sender.send("complete", "ckan");
-      });
-    })
+  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  for(var i = 0; i<folders.length; i++){
+    folder = folders[i];
+    moveFolder(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], version, event.sender)
   }
-  //Copy folder to profile
-  ncp(location+"\\GameData", profilePath+"\\GameData", function(err){
-    //Catch failure
-    if(err){
-      console.log("GameData FAILED")
-      //Mark as failed
-      event.sender.send("failed", "gameData");
-      event.sender.send("failed", "stock");
-      event.sender.send("failed", "dlc");
-      return;
-    }
 
-    //Copy squad folder
-    ncp(profilePath+"\\GameData\\Squad", stockPath+"\\Squad", function(err){
-      if(!err){
-        rimraf(profilePath+"\\GameData\\Squad", [], function(){
-          console.log("Stock DELETED")
-          //Mark as complete
-          event.sender.send("complete", "squad");
-        })
-      }
-      else {
-        event.sender.send("failed", "squad");
-      }
-    });
-
-    //Copy DLC folders
-    if(fs.existsSync(profilePath+"\\GameData\\SquadExpansion")){
-      ncp(profilePath+"\\GameData\\SquadExpansion", stockPath+"\\SquadExpansion", function(err){
-        if(!err){
-          rimraf(profilePath+"\\GameData\\SquadExpansion", [], function(){
-            console.log("DLC DELETED")
-            //Mark as complete
-            event.sender.send("complete", "dlc");
-          })
-        }
-        else {
-          event.sender.send("failed", "dlc");
-        }
-      });
-    }
-    else{
-      fs.mkdirSync(profilePath+"\\GameData\\SquadExpansion");
-      event.sender.send("complete", "dlc");
-    }
-
-
-    //Otherwise announce completion
-    console.log("GameData COPIED")
-    //Delete folder in KSP directory
-    rimraf(location+"\\GameData", [],  function(){
-      console.log("GameData DELETED")
-      //Mark as complete
-      event.sender.send("complete", "gameData");
-    });
-  })
-  //Copy folder to profile
-  ncp(location+"\\saves", profilePath+"\\saves", function(err){
-    //Catch failure
-    if(err){
-      console.log("saves FAILED")
-      //Mark as failed
-      event.sender.send("failed", "saves");
-      return;
-    }
-    //Otherwise announce completion
-    console.log("saves COPIED")
-    //Delete folder in KSP directory
-    rimraf(location+"\\saves", [],  function(){
-      console.log("saves DELETED")
-      //Mark as complete
-      event.sender.send("complete", "saves");
-    });
-  })
 })
 
 //Create symlinks to the new profile folders
@@ -491,7 +398,7 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
   //Get path to profile saves
-  var profilePath = path+"\\profiles\\"+version+"\\"+data["profile"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
@@ -504,7 +411,8 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
     // fs.symlinkSync(newPath, oldPath, "junction");
     //Mark as complete
     event.sender.send("complete", tag);
-  } else{
+  }
+  else{
     //Copy folder to profile
     ncp(oldPath, newPath, function(err){
       //Catch failure
@@ -516,6 +424,7 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
       }
       //Otherwise announce completion
       console.log(tag+" COPIED")
+      //Start copying dependents
       for(var i = 0; i<dependents.length; i++){
         var folder = dependents[i];
         moveFolder(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], version, renderer)
@@ -528,6 +437,5 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
         renderer.send("complete", tag);
       });
     })
-    }
   }
 }
