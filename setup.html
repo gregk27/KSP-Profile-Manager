@@ -112,6 +112,24 @@
 		ipcRenderer.send("finished-init")
 	}
 
+	ipcRenderer.on("generate-progress-indicators", function(e, tags){
+		var out = "\n\t<tr>\n"
+
+
+		for(var i = 0; i<tags.length; i++){
+		  tag = tags[i];
+		  out+='\t\t<td><h3><span class="check" id="'+tag+'_check">&#10003;</span><span class="x" id="'+tag+'_x">&times;</span>'+tag+'<div class="loader" id="'+tag+'_spin"></div></h3></td>\n'
+		  if((i+1)%3==0 &&(i+1)!=tags.length){
+		    out+="\t<tr>\n\t</tr>\n"
+		  }
+		  console.log(i%3)
+		}
+
+		out += "\t</tr>\n"
+
+		document.getElementById("progress_table").innerHTML = out;
+	})
+
 </script>
 <body style="color:white">
 	<header>
@@ -167,14 +185,9 @@
 	</div>
 	<div id="progress" style="display:none">
 		<h1>Progress</h1>
-		<h3><span class="check" id="gameData_check">&#10003;</span><span class="x" id="gameData_x">&times;</span>GameData<div class="loader"  id="gameData_spin"></div></h3>
-		<h3><span class="check" id="saves_check">&#10003;</span><span class="x" id="saves_x">&times;</span>Saves<div class="loader" id="saves_spin"></div></h3>
-		<h3><span class="check" id="ckan_check">&#10003;</span><span class="x" id="ckan_x">&times;</span>CKAN<div class="loader" id="ckan_spin"></div></h3>
-		<h3><span class="check" id="squad_check">&#10003;</span><span class="x" id="squad_x">&times;</span>Stock Parts<div class="loader" id="squad_spin"></div></h3>
-		<h3><span class="check" id="dlc_check">&#10003;</span><span class="x" id="dlc_x">&times;</span>DLC<div class="loader" id="dlc_spin"></div></h3>
+		<table id="progress_table">
 
-		<h3><span class="check" id="link_check">&#10003;</span><span class="x" id="link_x">&times;</span>Symlinks<div class="loader" id="link_spin"></div></h3>
-
+		</table>
 		<p>This process may take some time, depending on the amount of mods and saves you have installed</p>
 		<!-- <p>If your mods and saves dont appear when the installation is complete, press load to reaload the profile</p> -->
 

@@ -13,6 +13,12 @@
       "dependents":[]
     },
     {
+      "tag":"ships",
+      "oldPath":"game\\ships",
+      "newPath":"profile\\ships",
+      "dependents":[]
+    },
+    {
       "tag":"gameData",
       "oldPath":"game\\GameData",
       "newPath":"profile\\GameData",

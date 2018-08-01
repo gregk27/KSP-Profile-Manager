@@ -148,6 +148,7 @@ ipcMain.on('initialize', function(event, data){
     }
   };
 
+
   var version = data["version"]
 
   console.log(config);
@@ -169,6 +170,18 @@ ipcMain.on('initialize', function(event, data){
   fs.mkdirSync(profilePath)
 
   var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  var tags = [];
+
+  for(var i = 0; i<folders.length; i++){
+    tags.push(folders[i]["tag"]);
+    for(var j = 0; j<folders[i]["dependents"].length; j++){
+      tags.push(folders[i]["dependents"][j]["tag"])
+    }
+  }
+
+  event.sender.send("generate-progress-indicators", tags)
+
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
@@ -410,7 +423,7 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
     fs.mkdirSync(newPath)
     // fs.symlinkSync(newPath, oldPath, "junction");
     //Mark as complete
-    event.sender.send("complete", tag);
+    renderer.send("complete", tag);
   }
   else{
     //Copy folder to profile
