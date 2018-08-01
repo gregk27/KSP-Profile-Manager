@@ -214,6 +214,7 @@
 		function newProfileOverlay(state){
 			if(state){
 				//Open overlay
+				ipcRenderer.send("get-versions")
 				document.getElementById("newProfile").style.display = "block";
 			}
 			else{
@@ -222,10 +223,23 @@
 			}
 		}
 
+		ipcRenderer.on("get-versions", function(e, versions){
+				out = "";
+				for(var i = 0; i < versions.length; i++){
+					out+="<option";
+					if(i==0){
+						out+=" selected"
+					}
+					out+=">"+versions[i]+"</option>\n"
+				}
+				document.getElementById("version").innerHTML = out;
+		})
+
 		function createProfile(){
 			//Get name
 			var name = document.getElementById("new_profile_name").value;
-			ipcRenderer.send("create-profile", name, "1_4_1");
+			var version = document.getElementById("version").value.replace(/\./g, "_");
+			ipcRenderer.send("create-profile", name, version);
 			//Close overlay
 			newProfileOverlay(false);
 		}
@@ -296,18 +310,26 @@
 		</content>
 	</div>
 
-	<!-- Popup overlay that appears when launch button is pressed -->
+	<!-- Popup overlay that appears when new profile button is pressed -->
 	<div class="overlay" id="newProfile" >
 		<content>
 			<h1>Create Profile</h1>
 			Profile Name:  <input type="text" class="text" id="new_profile_name" value="New Profile"></input>
+			<br/><br/>
+	      Version:
+	      <select id="version">
+	        <option selected>Game Version</option>
+	        <option>Option 1</option>
+	        <option>Option 2</option>
+	        <option>Last long option test</option>
+	      </select>
 			<br/><br/>
 			<a onclick="newProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
 			<a onclick="createProfile()" style="width:40%; float:right; clear:none">Create</a>
 		</content>
 	</div>
 
-	<!-- Popup overlay that appears when launch button is pressed -->
+	<!-- Popup overlay that appears when rename profile button is pressed -->
 	<div class="overlay" id="renameProfile" >
 		<content>
 			<h1>Rename Profile</h1>
@@ -317,7 +339,6 @@
 			<a onclick="renameProfile()" style="width:40%; float:right; clear:none">Rename</a>
 		</content>
 	</div>
-
 
 	<!-- Popup overlay that appears when config button is pressed -->
 	<div class="overlay" id="configOverlay">
@@ -374,7 +395,6 @@
       </label>
       <a onclick="changeProfile()" class="load">Load</a>
     </div>
-
 
 	<!-- Short information overview, version + mod/save count -->
 	<section class="overview">
