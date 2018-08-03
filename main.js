@@ -368,7 +368,12 @@ ipcMain.on("change-profile", function(event,arg){
     newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
     oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
 
-    fs.rmdirSync(oldPath);
+    //If the folder to be replaced doesn't exist, don't worry
+    try{
+      fs.rmdirSync(oldPath);
+    }catch(err){
+      console.log(err);
+    }
     // sleep.sleep(1000, function(){
       fs.symlinkSync(newPath, oldPath, 'junction');
     // })
