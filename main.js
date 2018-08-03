@@ -193,44 +193,40 @@ ipcMain.on('initialize', function(event, data){
 //Create symlinks to the new profile folders
 ipcMain.on("finish-init", function(event){
 
-  console.log("Creating Links")
 
   var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
 
-  //Wait for 5 seconds to avoid access denied error
-  sleep.sleep(10000, function(){
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+  // location = location.substr(0, location.lastIndexOf("\\"))
 
-    for(var i = 0; i<folders.length; i++){
-      folder = folders[i];
-      createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
-      for(var j = 0; j<folder["dependents"].length; j++){
-        var subFolder = folder["dependents"][j];
-        createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
-      }
-    }
+  var version = config["profile"]["versions"][config["profile"]["selected"]];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program"
+  console.log("copying")
 
-    event.sender.send("complete", "links");
-    console.log("Links finished")
+  ncp(location, profilePath, function(err){
+    console.log("Copied")
+    rimraf(location, [], function(){
+      console.log("deleted")
+      sleep.sleep(1000, function(){
+        console.log("linking")
+        fs.symlinkSync(profilePath, location, "junction")
+          event.sender.send("complete", "general")
+          console.log("Creating Links")
 
-    var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
-    // location = location.substr(0, location.lastIndexOf("\\"))
+          for(var i = 0; i<folders.length; i++){
+            folder = folders[i];
+            createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
+            for(var j = 0; j<folder["dependents"].length; j++){
+              var subFolder = folder["dependents"][j];
+              createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
+            }
+          }
 
-    var version = config["profile"]["versions"][config["profile"]["selected"]];
-    var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
-    profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))
-    console.log("copying")
-
-    ncp(location, profilePath+"\\Game", function(err){
-      console.log("Copied")
-      rimraf(location, [], function(){
-        console.log("deleted")
-        sleep.sleep(1000, function(){
-          console.log("linking")
-          fs.symlinkSync(profilePath+"\\Game", location, "junction")
-
-          //Load main window to complete installation
-          event.sender.send("finished-init");
-        })
+          event.sender.send("complete", "links");
+          console.log("Links finished")
+        //Load main window to complete installation
+        event.sender.send("finished-init");
       })
     })
   })
