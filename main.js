@@ -340,18 +340,24 @@ ipcMain.on("create-profile", function(event, arg, version){
 //Change location of links
 ipcMain.on("change-profile", function(event,arg){
   //Gat path of KSP directory
+  var version = config["profile"]["versions"][config["profile"]["selected"]]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
-  //Delete old links
-  fs.rmdirSync(location+"\\saves")
-  fs.rmdirSync(location+"\\GameData")
-  fs.rmdirSync(location+"\\CKAN")
-  //Create new links
-  var version = config["versions"]["selected"]
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
-  fs.symlinkSync(profilePath+"\\saves", location+"\\saves", 'junction');
-  fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
-  fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
+  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  for(var i = 0; i<folders.length; i++){
+    folder = folders[i];
+    newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+    oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
+
+    fs.rmdirSync(oldPath);
+    // sleep.sleep(1000, function(){
+      fs.symlinkSync(newPath, oldPath, 'junction');
+    // })
+  }
+
   event.sender.send("refresh");
 })
 
