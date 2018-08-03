@@ -355,31 +355,42 @@ ipcMain.on("create-profile", function(event, arg, version){
 
 //Change location of links
 ipcMain.on("change-profile", function(event,arg){
+  var oldVersion = config["profile"]["versions"][config["profile"]["selected"]]
+  config["profile"]["selected"] = config["profile"]["profiles"].indexOf(arg)
   //Gat path of KSP directory
   var version = config["profile"]["versions"][config["profile"]["selected"]]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
 
-  for(var i = 0; i<folders.length; i++){
-    folder = folders[i];
-    newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
-    oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
+  if(version!=oldVersion){
+    console.log("change version")
+    rimraf(location, [], function(){
+      fs.symlinkSync(profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program", location, "junction");
 
-    //If the folder to be replaced doesn't exist, don't worry
-    try{
-      fs.rmdirSync(oldPath);
-    }catch(err){
-      console.log(err);
-    }
-    // sleep.sleep(1000, function(){
-      fs.symlinkSync(newPath, oldPath, 'junction');
-    // })
+      var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+      for(var i = 0; i<folders.length; i++){
+        folder = folders[i];
+        newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+        oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
+
+        //If the folder to be replaced doesn't exist, don't worry
+        try{
+          fs.rmdirSync(oldPath);
+        }catch(err){
+          console.log(err);
+        }
+        // sleep.sleep(1000, function(){
+          fs.symlinkSync(newPath, oldPath, 'junction');
+        // })
+      }
+
+      event.sender.send("refresh");
+    })
   }
 
-  event.sender.send("refresh");
 })
 
 //Renames a profile and associated folders
