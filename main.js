@@ -315,13 +315,21 @@ ipcMain.on("create-profile", function(event, arg, version){
   //Update config save
   saveConfig();
   //Create new folders
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
+
   console.log(profilePath);
   fs.mkdirSync(profilePath);
-  fs.mkdirSync(profilePath+"\\GameData");
-  fs.mkdirSync(profilePath+"\\saves");
-  fs.mkdirSync(profilePath+"\\CKAN");
+
+  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  for(var i = 0; i<folders.length; i++){
+    folder = folders[i];
+    path = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+
+    fs.mkdirSync(path);
+  }
 
   fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
   fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\GameData\\SquadExpansion", "junction");
@@ -392,7 +400,6 @@ function createLink(tag, oldPath, newPath, dependents, renderer){
     console.log(err)
   }
 }
-
 
 function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
 
