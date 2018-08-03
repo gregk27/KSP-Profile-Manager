@@ -209,10 +209,30 @@ ipcMain.on("finish-init", function(event){
       }
     }
 
-    event.sender.send("complete", "link");
-    console.log("FINISHED")
-    //Load main window to complete installation
-    event.sender.send("finished-init");
+    event.sender.send("complete", "links");
+    console.log("Links finished")
+
+    var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+    // location = location.substr(0, location.lastIndexOf("\\"))
+
+    var version = config["profile"]["versions"][config["profile"]["selected"]];
+    var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+    profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))
+    console.log("copying")
+
+    ncp(location, profilePath+"\\Game", function(err){
+      console.log("Copied")
+      rimraf(location, [], function(){
+        console.log("deleted")
+        sleep.sleep(1000, function(){
+          console.log("linking")
+          fs.symlinkSync(profilePath+"\\Game", location, "junction")
+
+          //Load main window to complete installation
+          event.sender.send("finished-init");
+        })
+      })
+    })
   })
 })
 

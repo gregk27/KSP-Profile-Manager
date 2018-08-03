@@ -107,8 +107,6 @@
 	})
 
 	ipcRenderer.on("finished-init", function(){
-		  document.getElementById("links_spin").style.display="none";
-		  document.getElementById("links_check").style.display="block";
 			document.getElementById("finish").style.display = "block"
 	})
 
@@ -130,7 +128,8 @@
 		  console.log(i%3)
 		}
 
-		out += '\t</tr>\n<br>\n<h3><span class="check" id="links_check">&#10003;</span><span class="x" id="links_x">&times;</span>Symlinks<div class="loader" id="links_spin"></div></h3></td>\n'
+		out += '\t</tr>\n<br>\n<h3><span class="check" id="links_check">&#10003;</span><span class="x" id="links_x">&times;</span>Symlinks<div class="loader" id="links_spin"></div></h3></td>\
+						\n<br>\n<h3><span class="check" id="general_check">&#10003;</span><span class="x" id="general_x">&times;</span>General Files<div class="loader" id="general_spin"></div></h3></td>\n'
 
 		document.getElementById("progress_table").innerHTML = out;
 	})
