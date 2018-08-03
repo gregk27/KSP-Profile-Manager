@@ -192,63 +192,28 @@ ipcMain.on('initialize', function(event, data){
 
 //Create symlinks to the new profile folders
 ipcMain.on("finish-init", function(event){
-  //Gat path of KSP directory
-  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
-  var version = "1_4_1"
+  console.log("Creating Links")
 
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
-
-  var stockPath = path+"\\profiles\\"+version+"\\.stock";
-
+  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
 
   //Wait for 5 seconds to avoid access denied error
   sleep.sleep(10000, function(){
-    //Create GameData symlink
-    try{
-      fs.symlinkSync(profilePath+"\\GameData", location+"\\GameData", "junction");
-    }catch (err){
-      console.log("GameData symlink failed")
-      event.sender.send("failed", "link");
-      event.sender.send("error", "100");
-      console.log(err)
-    }
-    //Create saves symlink
-    try{
-      fs.symlinkSync(profilePath+"\\saves", location+"\\saves", "junction");
-    } catch(err){
-      console.log("saves symlink failed")
-      event.sender.send("failed", "link");
-      event.sender.send("error", "101");
-    }
-    //Create CKAN symlink
-    try{
-      fs.symlinkSync(profilePath+"\\CKAN", location+"\\CKAN", "junction");
-    } catch(err){
-      console.log("CKAN symlink failed")
-      event.sender.send("failed", "link");
-      event.sender.send("error", "102");
-    }
-    try{
-      fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
-    } catch(err){
-      console.log("Squad symlink failed")
-      event.sender.send("failed", "link");
-      event.sender.send("error", "103");
-    }
-    try{
-      fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\GameData\\SquadExpansion", "junction");
-    } catch(err){
-      console.log("SquadExpansion symlink failed")
-      event.sender.send("failed", "link");
-      event.sender.send("error", "104");
+
+    for(var i = 0; i<folders.length; i++){
+      folder = folders[i];
+      createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
+      for(var j = 0; j<folder["dependents"].length; j++){
+        var subFolder = folder["dependents"][j];
+        createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
+      }
     }
 
     event.sender.send("complete", "link");
     console.log("FINISHED")
     //Load main window to complete installation
     event.sender.send("finished-init");
-  });
+  })
 })
 
 ipcMain.on("finished-init", function(){
@@ -404,6 +369,30 @@ function saveConfig(){
     console.log("Successfully Written to File.");
   });
 }
+
+function createLink(tag, oldPath, newPath, dependents, renderer){
+  //Gat path of KSP directory
+  var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+
+  var version = config["profile"]["versions"][config["profile"]["selected"]];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var stockPath = path+"\\profiles\\"+version+"\\.stock";
+
+
+  oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+  newPath = newPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+
+  try{
+    fs.symlinkSync(newPath, oldPath, "junction");
+    console.log("link complete:"+tag)
+  }catch (err){
+    console.log(tag+" symlink failed")
+    renderer.send("failed", "link");
+    renderer.send("error", "link-"+tag);
+    console.log(err)
+  }
+}
+
 
 function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
 

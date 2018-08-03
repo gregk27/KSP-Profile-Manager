@@ -7,6 +7,8 @@
 
 	var stepsComplete = 0;
 
+	var stepCount = 0;
+
 	"Basic window functions"
 		function win_close(){
 		  ipcRenderer.send('window-close');
@@ -87,9 +89,9 @@
 		document.getElementById(target+"_x").style.display="block";
 	})
 
-	//check to see if all 3 steps have been succesfully completed
+	//check to see if all steps have been succesfully completed
 	function checkSteps(){
-		if(stepsComplete==5){
+		if(stepsComplete==stepCount){
 			ipcRenderer.send("finish-init")
 		}
 	}
@@ -105,6 +107,8 @@
 	})
 
 	ipcRenderer.on("finished-init", function(){
+		  document.getElementById("links_spin").style.display="none";
+		  document.getElementById("links_check").style.display="block";
 			document.getElementById("finish").style.display = "block"
 	})
 
@@ -115,6 +119,7 @@
 	ipcRenderer.on("generate-progress-indicators", function(e, tags){
 		var out = "\n\t<tr>\n"
 
+		stepCount = tags.length;
 
 		for(var i = 0; i<tags.length; i++){
 		  tag = tags[i];
@@ -125,7 +130,7 @@
 		  console.log(i%3)
 		}
 
-		out += "\t</tr>\n"
+		out += '\t</tr>\n<br>\n<h3><span class="check" id="links_check">&#10003;</span><span class="x" id="links_x">&times;</span>Symlinks<div class="loader" id="links_spin"></div></h3></td>\n'
 
 		document.getElementById("progress_table").innerHTML = out;
 	})
@@ -191,7 +196,7 @@
 		<p>This process may take some time, depending on the amount of mods and saves you have installed</p>
 		<!-- <p>If your mods and saves dont appear when the installation is complete, press load to reaload the profile</p> -->
 
-      <a class="load" style="display:none; width:70%" onclick="finish()" id="finish">Continue</a><h3 id="errors"></h3>
+    <a class="load" style="display:none; width:70%" onclick="finish()" id="finish">Continue</a><h3 id="errors"></h3>
 
 	</div>
 
