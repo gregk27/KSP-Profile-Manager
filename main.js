@@ -342,9 +342,9 @@ ipcMain.on("create-profile", function(event, arg, version){
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
-    path = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+    var newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
 
-    fs.mkdirSync(path);
+    fs.mkdirSync(newPath);
   }
 
   fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
@@ -353,8 +353,11 @@ ipcMain.on("create-profile", function(event, arg, version){
   event.sender.send("new-profile-created");
 })
 
+changeCount = 0;
+
 //Change location of links
 ipcMain.on("change-profile", function(event,arg){
+  changeCount = 0;
   var oldVersion = config["profile"]["versions"][config["profile"]["selected"]]
   config["profile"]["selected"] = config["profile"]["profiles"].indexOf(arg)
   //Gat path of KSP directory
@@ -363,35 +366,47 @@ ipcMain.on("change-profile", function(event,arg){
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
+  console.log(oldVersion+"\t"+version)
+  console.log(location)
+  console.log(profilePath)
+  console.log(stockPath)
 
   if(version!=oldVersion){
     console.log("change version")
     rimraf(location, [], function(){
       fs.symlinkSync(profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program", location, "junction");
-
-      var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
-
-      for(var i = 0; i<folders.length; i++){
-        folder = folders[i];
-        newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
-        oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
-
-        //If the folder to be replaced doesn't exist, don't worry
-        try{
-          fs.rmdirSync(oldPath);
-        }catch(err){
-          console.log(err);
-        }
-        // sleep.sleep(1000, function(){
-          fs.symlinkSync(newPath, oldPath, 'junction');
-        // })
-      }
-
-      event.sender.send("refresh");
+      changeProfileRefresh(event.sender)
     })
   }
+  else{
+    changeProfileRefresh(event.sender)
+  }
+  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  for(var i = 0; i<folders.length; i++){
+    folder = folders[i];
+    newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
+    oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
+
+    //If the folder to be replaced doesn't exist, don't worry
+    try{
+      fs.rmdirSync(oldPath);
+    }catch(err){
+      console.log(err);
+    }
+    // sleep.sleep(1000, function(){
+      fs.symlinkSync(newPath, oldPath, 'junction');
+    // })
+  }
+  changeProfileRefresh(event.sender)
 
 })
+
+
+function changeProfileRefresh(renderer){
+  changeCount++;
+  if(changeCount==2)  renderer.send("refresh");
+}
 
 //Renames a profile and associated folders
 ipcMain.on("rename-profile", function(event, oldName, newName){
@@ -404,7 +419,7 @@ ipcMain.on("rename-profile", function(event, oldName, newName){
 })
 
 ipcMain.on("get-versions", function(event){
-  var data =getDirectories(path+"\\profiles").replace(/_/g, ".").split(";");
+  var data = getDirectories(path+"\\profiles").replace(/_/g, ".").split(";");
   event.sender.send("get-versions", data.splice(0, data.length-1))
 });
 
