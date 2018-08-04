@@ -1,0 +1,84 @@
+digraph G {
+	rankdir=LR;
+	subgraph cluster_Root{
+		label = "Root Directory";
+		Profiles -> {"1_4_1" "1_3_1"};
+
+		subgraph cluster_Version1{
+			label = "Version";
+			"1_4_1" -> {stock1 game1 profile1 profile2};
+			subgraph cluster_Public1{
+				label = "Shared";
+				stock1 [label = ".stock"];
+				game1 [label = "Kerbal Space Program"];
+
+				squad1 [label = "Squad"];
+				dlc1 [label = "SquadExpansion"];
+
+				stock1 -> {squad1 dlc1};
+				game1 -> ksp1[label = "KSP files"];
+			}
+			subgraph cluster_Profile1{
+				label = "Porfile";
+				profile1 [label = "Profile 1"];
+				GameData1 [label = "GameData"];
+				saves1 [label = "saves"];
+				ships1 [label = "ships"];
+				ckan1 [label = "ckan"];
+				profile1 -> {GameData1 saves1 ships1 ckan1};
+				{squad1 dlc1} -> GameData1 [color="blue" label = "symlink",weight="1"];
+			}
+			subgraph cluster_Profile2{
+				label = "Porfile (Active)";
+				color="red";
+				penwidth = "5";
+				profile2 [label = "Profile 2"];
+				GameData2 [label = "GameData"];
+				saves2 [label = "saves"];
+				ships2 [label = "ships"];
+				ckan2 [label = "ckan"];
+				profile2 -> {GameData2 saves2 ships2 ckan2};
+				{squad1 dlc1} -> GameData2 [color="blue" label = "symlink",weight="1"];
+				{GameData2 saves2 ships2 ckan2} -> game1 [color="blue" label = "symlink",weight="0.1"];
+			}
+		}
+		subgraph cluster_Version2{
+			label = "Version";
+			"1_3_1" -> {stock2 game2 profile3 profile4};
+			subgraph cluster_Public2{
+				label = "Shared";
+				stock2 [label = ".stock"];
+				game2 [label = "Kerbal Space Program"];
+
+				squad2 [label = "Squad"];
+				dlc2 [label = "SquadExpansion"];
+
+				stock2 -> {squad2 dlc2};
+				game2 -> ksp2 [label = "KSP files"];
+			}
+			subgraph cluster_Profile3{
+				label = "Porfile";
+				profile3 [label = "Profile 3"];
+				GameData3 [label = "GameData"];
+				saves3 [label = "saves"];
+				ships3 [label = "ships"];
+				ckan3 [label = "ckan"];
+				profile3 -> {GameData3 saves3 ships3 ckan3};
+				{squad2 dlc2} -> GameData3 [color="blue" label = "symlink",weight="1"];
+			}
+			subgraph cluster_Profile4{
+				label = "Porfile";
+				profile4 [label = "Profile 2"];
+				GameData4 [label = "GameData"];
+				saves4 [label = "saves"];
+				ships4 [label = "ships"];
+				ckan4 [label = "ckan"];
+				profile4 -> {GameData4 saves4 ships4 ckan4};
+				{squad2 dlc2} -> GameData4 [color="blue" label = "symlink",weight="1"];
+				{GameData4 saves4 ships4 ckan4} -> game2 [color="blue" label = "symlink",weight="0.5"];
+			}
+		}
+	}
+
+	game1->"Old KSP Direcory"[color="blue" label = "symlink",weight="0.5"];
+}
