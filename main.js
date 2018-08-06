@@ -36,6 +36,7 @@ var config = {
   }
 };
 
+//List of the directories that are profile specific
 var directories = [
   {
     "tag":"ckan",
@@ -212,6 +213,7 @@ ipcMain.on('initialize', function(event, data){
 
   var tags = [];
 
+  //Get the tags for the completion indicators
   for(var i = 0; i<folders.length; i++){
     tags.push(folders[i]["tag"]);
     for(var j = 0; j<folders[i]["dependents"].length; j++){
@@ -221,7 +223,7 @@ ipcMain.on('initialize', function(event, data){
 
   event.sender.send("generate-progress-indicators", tags)
 
-
+  //Move the required folders
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
     moveFolder(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], version, event.sender)
@@ -243,27 +245,33 @@ ipcMain.on("finish-init", function(event){
   profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program"
   console.log("copying")
 
+  //Copy KSP files
   ncp(location, profilePath, function(err){
     console.log("Copied")
+    //Delete old KSP files
     rimraf(location, [], function(){
       console.log("deleted")
+      //Delay to ensure that deletion is complete
       sleep.sleep(1000, function(){
         console.log("linking")
+        //Link the KSP files to the old location
         fs.symlinkSync(profilePath, location, "junction")
-          event.sender.send("complete", "general")
-          console.log("Creating Links")
+        event.sender.send("complete", "general")
+        console.log("Creating Links")
 
-          for(var i = 0; i<folders.length; i++){
-            folder = folders[i];
-            createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
-            for(var j = 0; j<folder["dependents"].length; j++){
-              var subFolder = folder["dependents"][j];
-              createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
-            }
+        //Create the links for the required folders
+        for(var i = 0; i<folders.length; i++){
+          folder = folders[i];
+          createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
+          //Create the links for the subfolders
+          for(var j = 0; j<folder["dependents"].length; j++){
+            var subFolder = folder["dependents"][j];
+            createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
           }
+        }
 
-          event.sender.send("complete", "links");
-          console.log("Links finished")
+        event.sender.send("complete", "links");
+        console.log("Links finished")
         //Load main window to complete installation
         event.sender.send("finished-init");
       })
@@ -271,6 +279,7 @@ ipcMain.on("finish-init", function(event){
   })
 })
 
+//Change the page the window is displaying
 ipcMain.on("finished-init", function(){
   window.loadFile("index.html");
 });
@@ -379,6 +388,7 @@ ipcMain.on("create-profile", function(event, arg, version){
 
   var folders = directories
 
+  //Create required folders
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
     var newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
@@ -386,15 +396,17 @@ ipcMain.on("create-profile", function(event, arg, version){
     fs.mkdirSync(newPath);
   }
 
+  //Make symlinks fpr main folders
   fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
   fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\GameData\\SquadExpansion", "junction");
 
   event.sender.send("new-profile-created");
 })
 
+//Counter for completed steps when changing profiles
 changeCount = 0;
 
-//Change location of links
+//Change profiles
 ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
   var oldVersion = config["profile"]["versions"][config["profile"]["selected"]]
@@ -405,14 +417,12 @@ ipcMain.on("change-profile", function(event,arg){
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
-  console.log(oldVersion+"\t"+version)
-  console.log(location)
-  console.log(profilePath)
-  console.log(stockPath)
-
+  //Change versions if needed
   if(version!=oldVersion){
     console.log("change version")
+    //Delete old link
     rimraf(location, [], function(){
+      //Make new link
       fs.symlinkSync(profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program", location, "junction");
       changeProfileRefresh(event.sender)
     })
@@ -420,10 +430,13 @@ ipcMain.on("change-profile", function(event,arg){
   else{
     changeProfileRefresh(event.sender)
   }
+
   var folders = directories
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
+
+    //Get paths
     newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
     oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
 
@@ -433,15 +446,14 @@ ipcMain.on("change-profile", function(event,arg){
     }catch(err){
       console.log(err);
     }
-    // sleep.sleep(1000, function(){
-      fs.symlinkSync(newPath, oldPath, 'junction');
-    // })
+    //Make the new links
+    fs.symlinkSync(newPath, oldPath, 'junction');
   }
   changeProfileRefresh(event.sender)
 
 })
 
-
+//Count the completed steps when changing profiles
 function changeProfileRefresh(renderer){
   changeCount++;
   if(changeCount==2)  renderer.send("refresh");
@@ -478,14 +490,16 @@ function createLink(tag, oldPath, newPath, dependents, renderer){
   var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
-
+  //Get the paths
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
   newPath = newPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
 
   try{
+    //Create the link
     fs.symlinkSync(newPath, oldPath, "junction");
     console.log("link complete:"+tag)
   }catch (err){
+    //Report the error
     console.log(tag+" symlink failed")
     renderer.send("failed", "link");
     renderer.send("error", "link-"+tag);
