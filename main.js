@@ -39,36 +39,36 @@ var config = {
 //List of the directories that are profile specific
 var directories = [
   {
-    "tag":"ckan",
+    "tag":"CKAN",
     "oldPath":"game\\CKAN",
     "newPath":"profile\\CKAN",
     "dependents":[]
   },
   {
-    "tag":"saves",
+    "tag":"Saves",
     "oldPath":"game\\saves",
     "newPath":"profile\\saves",
     "dependents":[]
   },
   {
-    "tag":"ships",
+    "tag":"Ships",
     "oldPath":"game\\ships",
     "newPath":"profile\\ships",
     "dependents":[]
   },
   {
-    "tag":"gameData",
+    "tag":"Mods",
     "oldPath":"game\\GameData",
     "newPath":"profile\\GameData",
     "dependents":[
       {
-        "tag":"squad",
+        "tag":"Stock",
         "oldPath":"profile\\GameData\\Squad",
         "newPath":"stock\\Squad",
         "dependents":[]
       },
       {
-        "tag":"dlc",
+        "tag":"DLC",
         "oldPath":"profile\\GameData\\SquadExpansion",
         "newPath":"stock\\SquadExpansion",
         "dependents":[]
