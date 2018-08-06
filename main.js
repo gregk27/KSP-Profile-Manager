@@ -36,6 +36,45 @@ var config = {
   }
 };
 
+var directories = [
+  {
+    "tag":"ckan",
+    "oldPath":"game\\CKAN",
+    "newPath":"profile\\CKAN",
+    "dependents":[]
+  },
+  {
+    "tag":"saves",
+    "oldPath":"game\\saves",
+    "newPath":"profile\\saves",
+    "dependents":[]
+  },
+  {
+    "tag":"ships",
+    "oldPath":"game\\ships",
+    "newPath":"profile\\ships",
+    "dependents":[]
+  },
+  {
+    "tag":"gameData",
+    "oldPath":"game\\GameData",
+    "newPath":"profile\\GameData",
+    "dependents":[
+      {
+        "tag":"squad",
+        "oldPath":"profile\\GameData\\Squad",
+        "newPath":"stock\\Squad",
+        "dependents":[]
+      },
+      {
+        "tag":"dlc",
+        "oldPath":"profile\\GameData\\SquadExpansion",
+        "newPath":"stock\\SquadExpansion",
+        "dependents":[]
+      }
+    ]
+  }
+]
 
 var path = app.getPath('userData')
 
@@ -338,7 +377,7 @@ ipcMain.on("create-profile", function(event, arg, version){
   console.log(profilePath);
   fs.mkdirSync(profilePath);
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
@@ -381,7 +420,7 @@ ipcMain.on("change-profile", function(event,arg){
   else{
     changeProfileRefresh(event.sender)
   }
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
