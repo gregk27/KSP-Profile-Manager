@@ -170,7 +170,11 @@ ipcMain.on('window-max', function (){
 });
 ipcMain.on('window-close', function(){
   console.log("close");
+  window.removeAllListeners('close');
   window.close();
+  sleep.sleep(500, function(){
+    app.quit();
+  })
 });
 
 //Initial configuration
