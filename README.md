@@ -5,6 +5,7 @@ Each profile has it's own:
   - Saves folder
   - GameData folder
   - CKAN folder
+  - Ships folder
   
 This allows you to have one set of mods for your career, and a seperate set of mods for your sandbox.
 
@@ -13,7 +14,7 @@ Installation is easy!
 
 Step 1: Get the [newest release](https://github.com/Aree-Vanier/KSP-Profile-Manager/releases)
 
-Step 2: **BACK UP YOUR SAVES** (and possibly mods). While it shouldn't happen, saves may be damaged by the install process
+Step 2: **BACK UP EVERYTHING** While it shouldn't happen, saves and other files may be damaged by the install process
 
 Step 3: Run `KSP-Profile-Manager.exe`
 
@@ -31,10 +32,6 @@ To create a profile, click the `New Profile` button in the top left.
 Enter a name for the new profile and click continue
 
 Click load to load the new profile
-
-## Adding squad folder to new profile
-
-To add the squad folder to a new profile, go to an existing profile (saved in appdata\Roaming\KSP-Profile-Manager\profiles) and copy the squad folder (in GameData) to the new profile
 
 # Selecting a profile
 Select the profile you want to load and click load
