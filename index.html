@@ -291,134 +291,59 @@
 </script>
 
 <body>
-	<!-- Header bar, contains config button and window buttons -->
-	<header>
-	  <a class="menu" id="config" onclick="configOverlay(true)"><div>&#9965;</div></a>
-		<a class="menu" onclick="newProfileOverlay(true)">New Profile</a>
-		<a class="menu" onclick="renameProfileOverlay(true)">Rename Profile</a>
-		<a class="close" id="close" onclick="win_close()">&times;</a>
-		<a class="close" id="max" onclick="win_max()">&square;</a>
-		<a class="close" id="min" onclick="win_min()">&#95;</a>
-	</header>
+  <!-- Header bar, contains config button and window buttons -->
+  <header>
+    <a class="close" id="close" onclick="win_close()">&times;</a>
+    <a class="close" id="max" onclick="win_max()">&square;</a>
+    <a class="close" id="min" onclick="win_min()">&#95;</a>
+  </header>
 
-	<!-- Popup overlay that appears when launch button is pressed -->
-	<div class="overlay" id="launchOverlay" >
-		<content>
-			<h1>Game Launched</h1>
-			<br/><br/><br/><br/>
-			<a onclick="launchOverlay(false)">Dismiss</a>
-		</content>
-	</div>
+  <search>
+    <input type="text"/>
+    <results>
+      <a>
+        <div class="selected profile" id="0">
+          <h2>Career</h2>
+          <p>Version:1.4.1</p>
+        </div>
+      </a>
+      <a>
+        <div class="profile" id="1">
+          <h2>Sandbox</h2>
+          <p>Version:1.4.1</p>
+        </div>
+      </a>
+    </results>
+  </search>
+  <content>
+    <header>
+      <h1>Career</h1>
+      <div style="margin-right:10%">
+        <a class="" id="play">Play</a>
+        <a class="" id="load">Load</a>
+      </div>
+    </header>
 
-	<!-- Popup overlay that appears when new profile button is pressed -->
-	<div class="overlay" id="newProfile" >
-		<content>
-			<h1>Create Profile</h1>
-			Profile Name:  <input type="text" class="text" id="new_profile_name" value="New Profile"></input>
-			<br/><br/>
-	      Version:
-	      <select id="version">
-	        <option selected>Game Version</option>
-	        <option>Option 1</option>
-	        <option>Option 2</option>
-	        <option>Last long option test</option>
-	      </select>
-			<br/><br/>
-			<a onclick="newProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
-			<a onclick="createProfile()" style="width:40%; float:right; clear:none">Create</a>
-		</content>
-	</div>
+    <div class="flex">
+      <article>
+        <h1>Mods</h1>
+        <ul id="mods">
+          <li>CKAN</li>
+          <li>Mechjeb</li>
+        </ul>
+      </article>
 
-	<!-- Popup overlay that appears when rename profile button is pressed -->
-	<div class="overlay" id="renameProfile" >
-		<content>
-			<h1>Rename Profile</h1>
-			New Name:  <input type="text" class="text" id="changed_profile_name" value="New name"></input>
-			<br/><br/>
-			<a onclick="renameProfileOverlay(false)" style="width:40%; float:left; clear:none">Cancel</a>
-			<a onclick="renameProfile()" style="width:40%; float:right; clear:none">Rename</a>
-		</content>
-	</div>
-
-	<!-- Popup overlay that appears when config button is pressed -->
-	<div class="overlay" id="configOverlay">
-		<content>
-			<h1>Launch Config</h1>
-			<!-- Installation mode selection -->
-			<div id="installMode">
-				<br/>
-				Installation mode:
-				<label class="container">Steam
-					<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
-					<span class="checkmark"></span>
-				</label>
-				<label class="container">Manual
-					<input type="radio" name="mode" onchange="manualMode()" id="installation_manual">
-					<span class="checkmark"></span>
-				</label>
-			</div>
-
-			<!-- EXE version selection -->
-			<div id="exeVersion" style="display:inline">
-				<br/>
-				Exe version:
-				<label class="container">64 bit
-					<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')" id="version_64">
-					<span class="checkmark"></span>
-				</label>
-				<label class="container">32 bit
-					<input type="radio" name="exeVersion" onchange="setExe('KSP')" id="version_32">
-					<span class="checkmark"></span>
-				</label>
-			</div>
-
-			<!-- Path input/display -->
-			<p>
-				Path:
-				<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
-			</p>
-
-			<br/>
-			<a onclick="configOverlay(false)">Confirm</a>
-		</content>
-	</div>
-
-	<!-- Profile name display -->
-  <div class="selectdiv">
-      <label>
-        <select class="profileName" id="profiles">
-          <option selected> Select Box </option>
-          <option>Option 1</option>
-          <option>Option 2</option>
-          <option>Last long option test</option>
-        </select>
-      </label>
-      <a onclick="changeProfile()" class="load">Load</a>
+      <article style="flex-grow:5">
+        <h1>Saves</h1>
+        <ul id="saves">
+          <li>CKAN</li>
+          <li>Mechjeb</li>
+        </ul>
+      </article>
     </div>
 
-	<!-- Short information overview, version + mod/save count -->
-	<section class="overview">
-		Version: 1.4.1<br/>
-		Mods: <span id="modCount">100</span><br/>
-		Saves: <span id="saveCount">2</span><br/>
-	</section>
 
-	<!-- Mod and savegame list -->
-	<div style="width:100%; height:100%">
-		<section class="panel" id="mods">
-			<h1>Mods</h1>
-			<ul id="modList">
-			</ul>
-		</section>
+  </content>
 
-		<section class="panel" id="saves">
-			<h1>Saves</h1>
-			<ul id="saveList">
-			</ul>
-		</section>
-	</div>
 
-	<footer>
-		<a class="launch" onclick="win_launch()"><span>Launch!</span><img src="launch.svg"/></a>
-	</footer>
 </body>
