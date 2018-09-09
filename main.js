@@ -143,7 +143,7 @@ var window;
 
 
 app.on('ready', function(){
-  window = new BrowserWindow({width:640, height:480, frame: false})
+  window = new BrowserWindow({width:1280, height:1024, frame: false})
   //If the config file doesn't exist, run install tool
   if(fs.existsSync(path+'\\config.json'))
     window.loadFile("index.html")

@@ -5,6 +5,8 @@
 
 	console.log("INIT");
 
+	profiles = [];
+	selected = 0;
 	"Basic window functions"
 			function win_close(){
 				ipcRenderer.send('window-close');
@@ -18,276 +20,63 @@
 	//-----------------------
 
 	"Backend requests"
-		//Send config request
-		function getconfig(){
-			ipcRenderer.send("request-config");
-		}
-		function getMods(){
-			ipcRenderer.send("get-mods");
-		}
-		function getSaves(){
-			ipcRenderer.send("get-saves");
-		}
 		function getProfiles(){
-			ipcRenderer.send("get-profiles")
+			ipcRenderer.send("get-profiles");
 		}
 	//-----------------------
 
-	"Launch functions"
-		function win_launch(){
-			//Launch KSP
-			ipcRenderer.send("window-launch");
-			launchOverlay(true);
-		}
-		//Set launch overlay sate
-		function launchOverlay(state) {
-		if(state)
-			//Enable ovelay
-			document.getElementById("launchOverlay").style.display = "block";
-		else
-			//Disable overlay
-			document.getElementById("launchOverlay").style.display = "none";
-	}
-	//-----------------------
+	// Profile Data structure:
+	// {
+  //   "name":"Career",
+  //   "version":"1.4.1",
+  //   "mods":[
+  //     "CKAN",
+  //     "Game Data",
+  //     "Mechjeb",
+  //     "Kerbal engineer redux"
+  //   ],
+  //   "saves"[
+  //     {
+  //       "name":"Save 1",
+  //       "mode":"Career",
+  //       "flights":"100",
+  //       "funds":"100",
+  //       "science":"100",
+  //       "rep":"100"
+  //     }
+  //   ]
+  // }
 
-	"Config Overlay"
-		//Set config ovelay state
-		function configOverlay(state) {
-			if(state){
-				//Open overlay
-				document.getElementById("configOverlay").style.display = "block";
-				//Load config
-				getconfig();
-			}
-			else{
-				//Close overlay
-				document.getElementById("configOverlay").style.display = "none";
-				//Save config
-				setconfig();
-			}
-		}
-
-		//Set to automatic path input mode
-		function steamMode(){
-			document.getElementById("ksp_path").disabled=true;
-			document.getElementById("exeVersion").style.display='inline';
-		}
-
-		//Set to manual path input mode
-		function manualMode(){
-			document.getElementById("ksp_path").disabled=false;
-			document.getElementById("exeVersion").style.display='none';
-		}
-
-		//Save config
-		function setconfig(){
-			var mode = "";
-			var version = "";
-
-			//Get mode
-			if(document.getElementById("installation_steam").checked)
-				mode="steam";
-			else
-				mode='manual';
-
-			//Get EXE version
-			if(document.getElementById("version_64").checked)
-				version="64";
-			else
-				version="32";
-
-			//Create JSON object
-			var config = {
-				"name":name,
-				"mode":mode,
-				"version":version,
-				"path":document.getElementById("ksp_path").value,
-			}
-
-			//Send to backend
-			ipcRenderer.send("set-config", config);
-		}
-
-		//Revceive config from backend
-		ipcRenderer.on("get-config", function(event, arg) {
-			//Set install mode
-			if(arg["mode"] == "steam"){
-				document.getElementById("installation_steam").checked = true;
-				steamMode();
-			}
-			else{
-				document.getElementById("installation_manual").checked = true;
-				manualMode();
-			}
-
-			//Set EXE version
-			if(arg["version"] == "64")
-				document.getElementById("version_64").checked = true;
-			else
-				document.getElementById("version_32").checked = true;
-
-			//Set KSP path
-			document.getElementById("ksp_path").value = arg["path"];
-
-		});
-
-		//Set path to EXE (steam mode)
-		function setExe(exe){
-			document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
-		}
-	//-----------------------
-
-	"Getters"
-		ipcRenderer.on("get-mods", function(event, arg){
-
-			var mods = arg.split(";");
-
-			var out = ""
-
-			//Create mod list
-			for(var i = 0; i<mods.length; i++){
-				out+="<li>"+mods[i]+"</li>\n"
-			}
-
-			//Set mod list
-			document.getElementById("modList").innerHTML=out;
-			//Set mod count
-			document.getElementById("modCount").innerHTML=mods.length;
-		});
-
-		ipcRenderer.on("get-saves", function(event, saves){
-
-			var out = ""
-
-			//Create saves list
-			for(var i = 0; i<saves.length; i++){
-
-				var meta="";
-
-				//Fist line of metadata, mode and flight count
-				if(saves[i]["flights"]=="1") var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flight";
-				else var line1 = saves[i]["mode"]+";  "+saves[i]["flights"]+" flights";
-				//Funds metadata
-				var funds = "<span style='color:#2ae21d'>"+saves[i]["funds"]+"</span>; ";
-				//Science metadata
-				var science = "<span style='color:#1de2d1'>"+saves[i]["science"]+"</span>; ";
-				//Reputation metadata
-				var rep = "<span style='color:#efe51c'>"+saves[i]["reputation"]+"</span>; ";
-
-				//Sandbox mode, display simple data
-				if(saves[i]["mode"]=="SANDBOX") meta = line1
-				//Science mode, show science and rep
-				if(saves[i]["mode"]=="SCIENCE") meta = line1+"<br/>"+science+rep
-				//Career mode, show all data
-				if(saves[i]["mode"]=="CAREER") meta = line1+"<br/>"+funds+science+rep
-
-				//Add save to list
-				out+="<li>"+saves[i]["name"]+"<br/><div>"+meta+"</div></li>\n"
-			}
-
-			//Set save list
-			document.getElementById("saveList").innerHTML=out;
-			//Set save count
-			document.getElementById("saveCount").innerHTML=saves.length;
-		});
-
-		ipcRenderer.on("get-profiles", function(event, raw){
-		var data = JSON.parse(raw);
-		var out = ""
-		var profiles = data["profiles"]
-
-		for(var i = 0; i < profiles.length; i++){
-			out+="<option";
-			if(i==data["selected"]){
-				out+=" selected"
-			}
-			out+=">"+profiles[i]+"</option>\n"
-		}
-
-		//Set save list
-		document.getElementById("profiles").innerHTML=out;
-
-	})
-	//-----------------------
-
-	"Create profile"
-		function newProfileOverlay(state){
-			if(state){
-				//Open overlay
-				ipcRenderer.send("get-versions")
-				document.getElementById("newProfile").style.display = "block";
-			}
-			else{
-				//Close overlay
-				document.getElementById("newProfile").style.display = "none";
-			}
-		}
-
-		ipcRenderer.on("get-versions", function(e, versions){
-				out = "";
-				for(var i = 0; i < versions.length; i++){
-					out+="<option";
-					if(i==0){
-						out+=" selected"
-					}
-					out+=">"+versions[i]+"</option>\n"
-				}
-				document.getElementById("version").innerHTML = out;
-		})
-
-		function createProfile(){
-			//Get name
-			var name = document.getElementById("new_profile_name").value;
-			var version = document.getElementById("version").value.replace(/\./g, "_");
-			ipcRenderer.send("create-profile", name, version);
-			//Close overlay
-			newProfileOverlay(false);
-		}
-
-		ipcRenderer.on("new-profile-created", function(){
-		//When a new profile is created, set it as active
-		getProfiles();
-	})
-	//-----------------------
-
-	"Rename Profile"
-		function renameProfile(newName){
-			ipcRenderer.send("rename-profile", document.getElementById("profiles").value, document.getElementById("changed_profile_name").value)
-			renameProfileOverlay(false);
-		}
-
-		function renameProfileOverlay(state){
-			if(state){
-				//Open overlay
-				document.getElementById("renameProfile").style.display = "block";
-			}
-			else{
-				//Close overlay
-				document.getElementById("renameProfile").style.display = "none";
-			}
-		}
-
-		ipcRenderer.on("profile-renamed", function(event, arg){
-			ipcRenderer.send("changeProfile", arg);
-			getProfiles();
-		})
-	//-----------------------
-
-
-	function changeProfile(){
-		var selected = document.getElementById("profiles").value;
-		ipcRenderer.send("change-profile", selected)
-	}
-
-	ipcRenderer.on("refresh", function(){
-		getSaves();
-		getMods();
+	ipcRenderer.on("get-profiles", function(e, profiles, selected){
+			displayProfiles(profiles, selected);
 	})
 
-	//Get mods and saves on start
-	getMods();
-	getSaves();
-	getProfiles();
+	function displayProfiles(profiles, selected, search){
+			window.profiles = profiles;
+			window.selected = selected;
+			var template =
+				'<a onclick ="showProfile($ID)">\n\
+				\t<div class="$SELECTEDprofile" id="$ID">\n\
+				\t\t<h2>$NAME</h2>\n\
+				\t\t<p>Version:$VERSION</p>\n\
+				\t</div>\n\
+				</a>\n';
+			var out = "";
+			for(var i=0; i<profiles.length; i++){
+					out+=template.replace("$ID", i).replace("$ID", i)
+	                     .replace("$SELECTED", (selected==i)?"selected ":"")
+										   .replace("$NAME", profiles[i]["name"])
+											 .replace("$VERSION", profiles[i]["version"]);
+			}
+		  document.getElementById("results").innerHTML=out;
+ 		}
+
+		function showProfile(profile){
+			document.getElementById(""+selected).className="profile";
+			selected = profile;
+			document.getElementById(""+profile).className="selected profile";
+		}
+
 </script>
 
 <body>
@@ -300,19 +89,8 @@
 
   <search>
     <input type="text"/>
-    <results>
-      <a>
-        <div class="selected profile" id="0">
-          <h2>Career</h2>
-          <p>Version:1.4.1</p>
-        </div>
-      </a>
-      <a>
-        <div class="profile" id="1">
-          <h2>Sandbox</h2>
-          <p>Version:1.4.1</p>
-        </div>
-      </a>
+    <results id="results">
+
     </results>
   </search>
   <content>
@@ -345,5 +123,72 @@
 
   </content>
 
+<script>
+
+		var profiles = [
+		  {
+		    "name":"Career",
+		    "version":"1.4.1",
+		    "mods":[
+		      "CKAN",
+		      "Game Data",
+		      "Mechjeb",
+		      "Kerbal engineer redux"
+		    ],
+		    "saves":[
+		      {
+		        "name":"Save 1",
+		        "mode":"Career",
+		        "flights":"100",
+		        "funds":"100",
+		        "science":"100",
+		        "rep":"100"
+		      }
+		    ]
+		  },
+		  {
+		    "name":"Sanbox",
+		    "version":"1.4.1",
+		    "mods":[
+		      "CKAN",
+		      "Game Data",
+		      "Mechjeb",
+		      "Kerbal engineer redux"
+		    ],
+		    "saves":[
+		      {
+		        "name":"Save 1",
+		        "mode":"Career",
+		        "flights":"100",
+		        "funds":"100",
+		        "science":"100",
+		        "rep":"100"
+		      }
+		    ]
+		  },
+		  {
+		    "name":"Weapons",
+		    "version":"1.4.1",
+		    "mods":[
+		      "CKAN",
+		      "Game Data",
+		      "Mechjeb",
+		      "Kerbal engineer redux"
+		    ],
+		    "saves":[
+		      {
+		        "name":"Save 1",
+		        "mode":"Career",
+		        "flights":"100",
+		        "funds":"100",
+		        "science":"100",
+		        "rep":"100"
+		      }
+		    ]
+		  }
+		];
+
+		displayProfiles(profiles, 0, "")
+</script>
 
 </body>
