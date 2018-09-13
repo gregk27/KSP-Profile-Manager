@@ -64,12 +64,14 @@
 				</a>\n';
 			var out = "";
 			for(var i=0; i<profiles.length; i++){
-					out+=template.replace("$ID", i).replace("$ID", i)
-	                     .replace("$SELECTED", (selected==i)?"selected ":"")
-										   .replace("$NAME", profiles[i]["name"])
-											 .replace("$VERSION", profiles[i]["version"])
-											 .replace("$MODS", profiles[i]["mods"].length)
-											 .replace("$SAVES", profiles[i]["saves"].length);
+        if(search==""||profiles[i]["name"].toLowerCase().includes(search.toLowerCase())){
+          out+=template.replace("$ID", i).replace("$ID", i)
+               .replace("$SELECTED", (selected==i)?"selected ":"")
+               .replace("$NAME", profiles[i]["name"])
+               .replace("$VERSION", profiles[i]["version"])
+               .replace("$MODS", profiles[i]["mods"].length)
+               .replace("$SAVES", profiles[i]["saves"].length);
+        }
 			}
 		  document.getElementById("results").innerHTML=out;
  		}
@@ -114,6 +116,11 @@
 
 		}
 
+		function search(){
+          console.log(document.getElementById("search").value)
+          displayProfiles(profiles, selected, document.getElementById("search").value)
+		}
+
 </script>
 
 <body>
@@ -125,7 +132,7 @@
   </header>
 
   <search>
-    <input type="text"/>
+    <input type="text" oninput="search()" id="search"/>
     <results id="results">
 
     </results>
