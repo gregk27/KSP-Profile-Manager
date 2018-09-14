@@ -30,10 +30,8 @@ var config = {
   "mode":"steam",
   "version":"64",
   "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
-  "profile":{
-    "selected":0,
-    "profiles":["Test"]
-  }
+  "loaded":0,
+  "profiles":[{"name":"test", "version":"1_4_1"}]
 };
 
 //List of the directories that are profile specific
@@ -98,32 +96,8 @@ if(fs.existsSync(path+"\\config.json")){
   });
 }
 
-console.log(config["profile"]["profiles"][config["profile"]["selected"]])
+console.log(config["profiles"][config["loaded"]]["name"])
 
-//Parses ksp save file to JSON
-function parseSFS(path){
-  //Load save file
-  var data = fs.readFileSync(path, "utf-8").replace(/\r/g, "").replace(/\\/g, "\\\\");
-
-  data=('{"'+data+'}')
-  .replace(/(\) *)=( *\()/g, "$1->$2")
-  .replace(/"/g, "'")
-  .replace(/{'([A-Z])/g, '{\"$1')
-  .replace(/ = */g, '": "')
-  .replace(/\n/g, '",\n')
-  .replace(/(\t+)/g, '$1"')
-  .replace(/\n\t{0}([{,},A-Z])/g, '\n"$1')
-  .replace(/^/g, '"')
-  .replace(/"{/g, "{" )
-  .replace(/{"*,*\n/g, "{\n" )
-  .replace(/"}/g, "}" )
-  .replace(/}"/g, "}" )
-  .replace(/},(\n\t*})/g, "}$1")
-  .replace(/,(\n\t*{)/g, ":$1")
-  .replace(/,(\n\t*})/g, "$1");
-
-  return(JSON.parse(data)['GAME'])
-}
 
 //Add commas to seperate thousands
 function commaFormat(num){
@@ -244,8 +218,8 @@ ipcMain.on("finish-init", function(event){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   // location = location.substr(0, location.lastIndexOf("\\"))
 
-  var version = config["profile"]["versions"][config["profile"]["selected"]];
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var version = config["profiles"][config["loaded"]]["version"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program"
   console.log("copying")
 
@@ -379,7 +353,7 @@ ipcMain.on("create-profile", function(event, arg, version){
   config["profile"]["profiles"].push(arg)
   config["profile"]["versions"].push(version)
   //Select profile
-  config["profile"]["selected"] = config["profile"]["profiles"].length-1;
+  config["loaded"] = config["profile"]["profiles"].length-1;
   //Update config save
   saveConfig();
   //Create new folders
@@ -413,10 +387,10 @@ changeCount = 0;
 //Change profiles
 ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
-  var oldVersion = config["profile"]["versions"][config["profile"]["selected"]]
-  config["profile"]["selected"] = config["profile"]["profiles"].indexOf(arg)
+  var oldVersion = config["profiles"][config["loaded"]]["version"]
+  config["loaded"] = config["profile"]["profiles"].indexOf(arg)
   //Gat path of KSP directory
-  var version = config["profile"]["versions"][config["profile"]["selected"]]
+  var version = config["profiles"][config["loaded"]]["version"]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   var profilePath = path+"\\profiles\\"+version+"\\"+arg;
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
@@ -490,8 +464,8 @@ function createLink(tag, oldPath, newPath, dependents, renderer){
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
-  var version = config["profile"]["versions"][config["profile"]["selected"]];
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var version = config["profiles"][config["loaded"]]["version"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   //Get the paths
@@ -517,7 +491,7 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
   //Get path to profile saves
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
