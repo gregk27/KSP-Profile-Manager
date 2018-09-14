@@ -339,21 +339,20 @@ ipcMain.on("get-saves", function(event){
     })
   }
   //Send to renderer
-  event.sender.send("get-saves", saves);
+  return saves;
 })
 
 //Send profile data to renderer
 ipcMain.on("get-profiles", function(event){
-  event.sender.send("get-profiles", JSON.stringify(config["profile"]));
+  event.sender.send("get-profiles", JSON.stringify(config["profiles"]));
 })
 
 //Create new profile
 ipcMain.on("create-profile", function(event, arg, version){
   //Add profile
-  config["profile"]["profiles"].push(arg)
-  config["profile"]["versions"].push(version)
+  config["profiles"].push({"name":arg, "version":version})
   //Select profile
-  config["loaded"] = config["profile"]["profiles"].length-1;
+  config["loaded"] = config["profiles"].length-1;
   //Update config save
   saveConfig();
   //Create new folders
@@ -388,7 +387,7 @@ changeCount = 0;
 ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
   var oldVersion = config["profiles"][config["loaded"]]["version"]
-  config["loaded"] = config["profile"]["profiles"].indexOf(arg)
+  config["loaded"] = config["profile"]["profiles"].indexOf(arg) //TODO: use new systems, use hard index instead of indexOf
   //Gat path of KSP directory
   var version = config["profiles"][config["loaded"]]["version"]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
@@ -440,7 +439,7 @@ function changeProfileRefresh(renderer){
 //Renames a profile and associated folders
 ipcMain.on("rename-profile", function(event, oldName, newName){
   //Rename in config
-  config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName;
+  config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName; //TODO: use new systems, use hard index instead of indexOf
   saveConfig();
   //Rename folder
   fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
