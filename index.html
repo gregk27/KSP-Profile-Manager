@@ -51,7 +51,8 @@
   // }
 
 	ipcRenderer.on("get-profiles", function(e, profiles, loaded){
-			displayProfiles(profiles, selected);
+			console.log(profiles)
+			displayProfiles(profiles, loaded);
 			showProfile(loaded);
 	})
 
@@ -140,6 +141,8 @@
 		function play(){
 
 		}
+
+		ipcRenderer.send("get-profiles");
 
 </script>
 
@@ -260,9 +263,10 @@
 		  }
 		];
 
-		displayProfiles(profiles, 0, "")
+		// displayProfiles(profiles, 0, "")
+		//
+		// showProfile(0);
 
-		showProfile(0);
 </script>
 
 </body>

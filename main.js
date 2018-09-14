@@ -285,14 +285,15 @@ ipcMain.on("request-config", function(event){
 })
 
 //Send mods to renderer
-ipcMain.on("get-mods", function(event){
-  event.sender.send("get-mods", getDirectories(config["path"].substr(0, config["path"].lastIndexOf("\\"))+"\\GameData", false));
-});
+function getMods(profile){
+  console.log(getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\GameData", false));
+  return getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\GameData", false).split(";");
+};
 
 //Send saves and metadata to renderer
-ipcMain.on("get-saves", function(event){
+function getSaves(profile){
   //Get list of save games
-  var saveDirs = getDirectories(config["path"].substr(0, config["path"].lastIndexOf("\\"))+"\\saves", true);
+  var saveDirs = getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\saves", true);
 
   var saves = [];
 
@@ -337,14 +338,59 @@ ipcMain.on("get-saves", function(event){
       "reputation":rep,
       "flights":flights
     })
+    console.log("SAVE:")
+    console.log(saves);
   }
   //Send to renderer
   return saves;
-})
+}
 
+
+function getProfiles(){
+  // Profile Data structure:
+  // {
+  //   "name":"Career",
+  //   "version":"1.4.1",
+  //   "mods":[
+  //     "CKAN",
+  //     "Game Data",
+  //     "Mechjeb",
+  //     "Kerbal engineer redux"
+  //   ],
+  //   "saves"[
+  //     {
+  //       "name":"Save 1",
+  //       "mode":"CAREER",
+  //       "flights":"100",
+  //       "funds":"100",
+  //       "science":"100",
+  //       "reputation":"100"
+  //     }
+  //   ]
+  // }
+
+  profiles = [];
+  for(var i=0; i<config["profiles"].length; i++){
+    profile = config["profiles"][i];
+    console.log(profile)
+    out = {
+      "name":profile["name"],
+      "version":profile["version"].replace(/_/g, "."),
+      "mods":null,
+      "saves":null
+    }
+    console.log(out)
+    out.mods = getMods(profile);
+    console.log(out)
+    out.saves = getSaves(profile);
+    console.log(out)
+    profiles.push(out);
+  }
+  return profiles;
+}
 //Send profile data to renderer
 ipcMain.on("get-profiles", function(event){
-  event.sender.send("get-profiles", JSON.stringify(config["profiles"]));
+  event.sender.send("get-profiles", getProfiles(), config["loaded"]);
 })
 
 //Create new profile
