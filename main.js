@@ -373,7 +373,7 @@ function getProfiles(){
   for(var i=0; i<config["profiles"].length; i++){
     profile = config["profiles"][i];
     console.log(profile)
-    out = {
+    var out = {
       "name":profile["name"],
       "version":profile["version"].replace(/_/g, "."),
       "mods":null,
@@ -382,6 +382,7 @@ function getProfiles(){
     console.log(out)
     out.mods = getMods(profile);
     console.log(out)
+    console.log(getSaves(profile))
     out.saves = getSaves(profile);
     console.log(out)
     profiles.push(out);
