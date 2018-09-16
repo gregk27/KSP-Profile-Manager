@@ -433,13 +433,14 @@ changeCount = 0;
 //Change profiles
 ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
-  var oldVersion = config["profiles"][config["loaded"]]["version"]
-  config["loaded"] = config["profile"]["profiles"].indexOf(arg) //TODO: use new systems, use hard index instead of indexOf
+  var oldVersion = config["profiles"][config["loaded"]]["version"];
+  config["loaded"] = arg;
   //Gat path of KSP directory
   var version = config["profiles"][config["loaded"]]["version"]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
-  var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][arg]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
+  console.log(profilePath)
 
   //Change versions if needed
   if(version!=oldVersion){

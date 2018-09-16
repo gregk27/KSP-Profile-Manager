@@ -51,8 +51,9 @@
   // }
 
 	ipcRenderer.on("get-profiles", function(e, profiles, loaded){
-			console.log(profiles)
-			displayProfiles(profiles, loaded);
+			console.log(loaded)
+			window.loaded = loaded;
+			displayProfiles(profiles, loaded, "");
 			showProfile(loaded);
 	})
 
@@ -90,6 +91,7 @@
 			document.getElementById("play").className=(selected!=loaded?"disabled":"")
 
 			console.log(profiles[selected]["mods"])
+			document.getElementById("name").innerHTML=profiles[selected]["name"];
 
 			var out = "";
 			for(var i = 0; i<profiles[selected]["mods"].length; i++){
@@ -130,7 +132,9 @@
 		}
 
 		function load(){
+			console.log("load")
 			loaded = selected;
+			ipcRenderer.send("change-profile", selected)
 		}
 
 		ipcRenderer.on("load-finished", function(){
@@ -162,7 +166,7 @@
   </search>
   <content>
     <header>
-      <h1>Career</h1>
+      <h1 id="name">Career</h1>
       <div style="margin-right:10%">
         <a class="" id="play" onclick="play()">Play</a>
         <a class="" id="load" onclick="load()">Load</a>

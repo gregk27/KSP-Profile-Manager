@@ -168,6 +168,8 @@ article{
   min-width:260px ;
   flex-grow:1;
   flex-shrink:1;
+	overflow-y: scroll;
+	max-height: 60%;
 }
 
 article h1{
