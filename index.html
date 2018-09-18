@@ -137,7 +137,7 @@
 			ipcRenderer.send("change-profile", selected)
 		}
 
-		ipcRenderer.on("load-finished", function(){
+		ipcRenderer.on("refresh", function(){
 			document.getElementById("load").className=(selected==loaded?"disabled":"")
 			document.getElementById("play").className=(selected!=loaded?"disabled":"")
 		})
@@ -159,7 +159,10 @@
   </header>
 
   <search>
-    <input type="text" oninput="search()" id="search"/>
+    <div class="input">
+      <input type="text" oninput="search()" id="search"/>
+      <a>+</a>
+    </div>
     <results id="results">
 
     </results>

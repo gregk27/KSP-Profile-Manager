@@ -89,12 +89,28 @@ results{
 }
 
 
+search .input{
+  display:flex;
+  width:95%
+}
+
 search input{
   border:none;
-  margin:10px 5%;
+  margin:10px 0px 0px 5%;
   padding:5px 10px;
-  width:90%;
+  width:75%;
   font-size:20px;
+  flex: 1;
+}
+
+search .input a{
+  border:none;
+  background-color:#9e9e9e;
+  margin:10px 5% 0px 0px;
+  padding:6px 10px;
+  padding-left:10px;
+  font-size:20px;
+  flex: 0;
 }
 
 .selected{
