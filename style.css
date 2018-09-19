@@ -195,3 +195,52 @@ article ul{
   margin-top:5px;
   list-style:none;
 }
+
+.overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: block; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+.overlay section{
+  padding:15px;
+  padding-bottom:60px;
+  background-color:#424242;
+  width:50%;
+  min-width:350px;
+  max-width:500px;
+  position: relative;
+  top: 30%;
+  transform: translateY(-50%);
+  margin:auto;
+}
+
+.overlay a{
+  margin-right:5%;
+  float:right;
+  background-color:limegreen;
+  padding:10px 15px;
+}
+
+.overlay table{
+  margin-left:5%;
+  font-size:20px;
+}
+
+.overlay input{
+  border:none;
+  padding:5px;
+}
+
+.overlay select{
+  border:none;
+  font-size:17px;
+  padding:1.5px;
+}

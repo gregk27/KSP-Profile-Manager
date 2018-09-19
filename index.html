@@ -146,6 +146,22 @@
 
 		}
 
+		function  showNewProfile(){
+			if(document.getElementById("search").value!=""){
+				document.getElementById("new_name").value = document.getElementById("search").value;
+			}
+			document.getElementById("new_profile").style.display = "block";
+		}
+
+		function hideNewProfile(){
+			document.getElementById("new_profile").style.display = "none";
+		}
+
+		function createNewProfile(){
+
+		}
+
+
 		ipcRenderer.send("get-profiles");
 
 </script>
@@ -161,7 +177,7 @@
   <search>
     <div class="input">
       <input type="text" oninput="search()" id="search"/>
-      <a>+</a>
+      <a onclick="showNewProfile()">+</a>
     </div>
     <results id="results">
 
@@ -196,6 +212,29 @@
 
 
   </content>
+
+  <div class="overlay" id="new_profile" style="display:none">
+    <section>
+      <h1>New Profile</h1>
+      <table>
+        <tr>
+          <td>Name</td>
+          <td><input type="text" id="new_name"/></td>
+        </tr>
+        <tr>
+          <td>Version</td>
+          <td>
+            <select id="new_version">
+            <option>1.3.1</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <br/>
+      <a>Create</a>
+      <a style="background-color:red" onclick="hideNewProfile()">Cancel</a>
+    </section>
+  </div>
 
 <script>
 
