@@ -138,6 +138,7 @@
 		}
 
 		ipcRenderer.on("refresh", function(){
+			ipcRenderer.send("get-profiles");
 			document.getElementById("load").className=(selected==loaded?"disabled":"")
 			document.getElementById("play").className=(selected!=loaded?"disabled":"")
 		})
@@ -158,7 +159,8 @@
 		}
 
 		function createNewProfile(){
-
+			ipcRenderer.send("create-profile", document.getElementById("new_name").value, document.getElementById("new_version").value.replace(".", "_").replace(".", "_"));
+			hideNewProfile();
 		}
 
 
@@ -225,13 +227,13 @@
           <td>Version</td>
           <td>
             <select id="new_version">
-            <option>1.3.1</option>
+            <option>1.4.1</option>
             </select>
           </td>
         </tr>
       </table>
       <br/>
-      <a>Create</a>
+      <a onclick="createNewProfile()">Create</a>
       <a style="background-color:red" onclick="hideNewProfile()">Cancel</a>
     </section>
   </div>
