@@ -81,6 +81,10 @@ console.log(path+"\\config.json");
 
 //Load config
 if(fs.existsSync(path+"\\config.json")){
+  getConfig();
+}
+
+function getConfig(){
   fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
     try{
       var data = JSON.parse(buf.toString());
@@ -368,7 +372,6 @@ function getProfiles(){
   //     }
   //   ]
   // }
-
   profiles = [];
   for(var i=0; i<config["profiles"].length; i++){
     profile = config["profiles"][i];
@@ -485,13 +488,15 @@ function changeProfileRefresh(renderer){
 }
 
 //Renames a profile and associated folders
-ipcMain.on("rename-profile", function(event, oldName, newName){
+ipcMain.on("edit-profile", function(event, index, newName){
+  var oldName = config["profiles"][index]["name"];
+  var version = config["profiles"][index]["version"];
   //Rename in config
-  config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName; //TODO: use new systems, use hard index instead of indexOf
+  config["profiles"][index]["name"] = newName;
   saveConfig();
   //Rename folder
-  fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
-  event.sender.send("profile-renamed", newName);
+  fs.renameSync(path+"\\profiles\\"+version+"\\"+oldName, path+"\\profiles\\"+version+"\\"+newName);
+  event.sender.send("refresh");
 })
 
 ipcMain.on("get-versions", function(event){

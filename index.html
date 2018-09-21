@@ -163,6 +163,20 @@
 			hideNewProfile();
 		}
 
+  		function  showEditProfile(){
+            document.getElementById("rename").value = document.getElementById("name").innerHTML;
+			document.getElementById("edit_profile").style.display = "block";
+		}
+
+		function hideEditProfile(){
+			document.getElementById("edit_profile").style.display = "none";
+		}
+
+		function editProfile(){
+			ipcRenderer.send("edit-profile", selected, document.getElementById("rename").value);
+			hideEditProfile();
+		}
+
 
 		ipcRenderer.send("get-profiles");
 
@@ -188,7 +202,7 @@
   </search>
   <content>
     <header>
-      <h1><span id="name">Career</span><a id="edit" onclick="edit()">&#x270E;</a></h1>
+      <h1><span id="name">Career</span><a id="edit" onclick="showEditProfile()">&#x270E;</a></h1>
       <div style="margin-right:10%">
         <a class="" id="play" onclick="play()">Play</a>
         <a class="" id="load" onclick="load()">Load</a>
@@ -236,6 +250,20 @@
       <br/>
       <a onclick="createNewProfile()">Create</a>
       <a style="background-color:red" onclick="hideNewProfile()">Cancel</a>
+    </section>
+  </div>
+  <div class="overlay" id="edit_profile" style="display:none">
+    <section>
+      <h1>Edit Profile</h1>
+      <table>
+        <tr>
+          <td>Name</td>
+          <td><input type="text" id="rename"/></td>
+        </tr>
+      </table>
+      <br/>
+      <a onclick="editProfile()">Change</a>
+      <a style="background-color:red" onclick="hideEditProfile()">Cancel</a>
     </section>
   </div>
 
