@@ -70,8 +70,6 @@ header{
     background: #555;
 }
 
-
-
 search{
   display:block;
   float:left;
@@ -157,7 +155,7 @@ content header h1{
   float:left;
 }
 
-content header a{
+content header div a{
   float:right;
   transform:translate(0px, 50%);
   display:inline-block;
@@ -243,4 +241,15 @@ article ul{
   border:none;
   font-size:17px;
   padding:1.5px;
+}
+
+#edit{
+  display:block;
+  float:right;
+  transform:translate(5px, -5px) rotate(75deg);
+  color:#212121;
+}
+
+content header h1:hover #edit{
+  color:inherit !important;
 }
