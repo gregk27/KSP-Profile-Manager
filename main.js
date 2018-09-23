@@ -158,6 +158,7 @@ ipcMain.on('initialize', function(event, data){
   //Get config from send data
   config = data;
 
+  version = config["profiles"][0]["version"]
   console.log(config);
 
   //Save the config
@@ -167,7 +168,7 @@ ipcMain.on('initialize', function(event, data){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
   //Get path to profile saves
-  var profilePath = path+"\\profiles\\"+version+"\\"+data["profile"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+data["profiles"][0]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   //Create profile foledr
@@ -538,8 +539,10 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
   newPath = newPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
 
+  console.log(oldPath)
   //Check if the old path exists
   if(!fs.existsSync(oldPath)){
+    console.log("Does not exist "+tag)
     //If the old path doesnt exist, only make new path
     fs.mkdirSync(newPath)
     // fs.symlinkSync(newPath, oldPath, "junction");

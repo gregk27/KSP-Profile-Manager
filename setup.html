@@ -30,7 +30,7 @@
 
 	  var profileName = document.getElementById("profile_name").value;
 
-		var profileVersion = document.getElementById("profile_version").value;
+		var profileVersion = document.getElementById("profile_version").value.replace("/./g", "_");
 
 		var data = {
 		  "path":path,
@@ -40,8 +40,6 @@
 		      {"name":profileName,"version":profileVersion}
 		    ]
 		  }
-		}
-
 		//Send data to backend
     ipcRenderer.send("initialize", data);
 
@@ -119,17 +117,15 @@
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
 	<div id="setup" style="display:block; padding-left:15px">
-		<div id="installMode">
-			<h2>KSP executable path</h2>
-
+		<h2>KSP executable path</h2>
 		<!-- Path input/display -->
 		<p>
 			Path to KSP executable:
-			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
+			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe"></input>
 		</p>
 		<p>
 			Path to CKAN executable:
-			<input type="text" class="text" id="ckan_path" value="" disabled></input>
+			<input type="text" class="text" id="ckan_path" value=""></input>
 		</p>
 
 		<br/>
