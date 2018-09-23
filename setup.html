@@ -21,52 +21,27 @@
 		}
 	//-----------------------
 
-	//Set to automatic path input mode
-	function steamMode(){
-	  document.getElementById("ksp_path").disabled=true;
-	  document.getElementById("exeVersion").style.display='inline';
-	}
-
-	//Set to manual path input mode
-	function manualMode(){
-	  document.getElementById("ksp_path").disabled=false;
-	  document.getElementById("exeVersion").style.display='none';
-	}
-	//Set path to EXE (steam mode)
-	function setExe(exe){
-	  document.getElementById("ksp_path").value = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\"+exe+".exe";
-	}
-
 	function submit(){
-	  var mode = "";
-	  var version = "";
 
 	  //Get mode
-	  if(document.getElementById("installation_steam").checked)
-	    mode="steam";
-	  else
-	    mode='manual';
-
-	  //Get EXE version
-	  if(document.getElementById("version_64").checked)
-	    version="64";
-	  else
-	    version="32";
-
 	  var path = document.getElementById("ksp_path").value;
+
+	  var ckan = document.getElementById("ckan_path").value;
 
 	  var profileName = document.getElementById("profile_name").value;
 
-    var data = {
-	    "mode":mode,
-	    "exe":version,
-	    "path":path,
-	    "profile":profileName,
-			"version":"1_4_1"
-	  }
+		var profileVersion = document.getElementById("profile_version").value.replace("/./g", "_");
 
+		var data = {
+		  "path":path,
+		  "CKAN":ckan,
+		  "loaded":0,
+		  "profiles":[
+		      {"name":profileName,"version":profileVersion}
+		    ]
+		  }
 		//Send data to backend
-    ipcRenderer.send("initialize", JSON.stringify(data));
+    ipcRenderer.send("initialize", data);
 
 		//Show progress menu
     document.getElementById("setup").style.display="none";
@@ -142,44 +117,30 @@
 		<a class="close" id="min" onclick="win_min()">&#95;</a>
 	</header>
 	<div id="setup" style="display:block; padding-left:15px">
-		<div id="installMode">
-			<h2>KSP executable path</h2>
-			Installion mode:
-			<label class="container">Steam
-				<input type="radio" name="mode" checked='true' onchange="steamMode()" id="installation_steam">
-				<span class="checkmark"></span>
-			</label>
-			<label class="container">Manual
-				<input type="radio" name="mode" onchange="manualMode()" id="installation_manual">
-				<span class="checkmark"></span>
-			</label>
-		</div>
-
-		<!-- EXE version selection -->
-		<div id="exeVersion" style="display:inline">
-			<br/>
-			Exe version:
-			<label class="container">64 bit
-				<input type="radio" name="exeVersion" checked='true' onchange="setExe('KSP_x64')" id="version_64">
-				<span class="checkmark"></span>
-			</label>
-			<label class="container">32 bit
-				<input type="radio" name="exeVersion" onchange="setExe('KSP')" id="version_32">
-				<span class="checkmark"></span>
-			</label>
-		</div>
-
+		<h2>KSP executable path</h2>
 		<!-- Path input/display -->
 		<p>
-			Path:
-			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
+			Path to KSP executable:
+			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe"></input>
+		</p>
+		<p>
+			Path to CKAN executable:
+			<input type="text" class="text" id="ckan_path" value=""></input>
 		</p>
 
 		<br/>
 		<div>
 			<h2>Initial profile</h2>
-			Name: <input type="text" class="text" id="profile_name" value="First profile"></input>
-
+			<table style="width:60%">
+				<tr style="width:100%">
+					<td >Name:</td>
+					<td><input type="text" class="text" id="profile_name" value="First profile"></input></td>
+				</tr>
+				<tr style="width:100%">
+					<td>Version:</td>
+					<td><input type="text" class="text" id="profile_version" value="Newest"></input></td>
+				</tr>
+			</table>
 		</div>
 		<br/>
 		<p>Back up your saves and mods before continuing in case of unplanned rapid disassembly</p>

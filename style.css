@@ -16,6 +16,7 @@ body{
 	background-color:/*bg*/#303030;
 	-webkit-user-select:none;
 	overflow: hidden;
+    color:white;
 }
 
 a{
@@ -53,282 +54,222 @@ header{
 	background-color:/*ac3*/#9e9e9e;
 }
 
-/* Other header buttons */
-.menu{
-	font-family:sans-serif !important;
-	float:left;
-	padding:5px 15px 5px 15px;
-	font-size:20px;
-}
-.menu:hover{
-	color:/*ac2*/#424242;'
-	font-weight:bold;
-	background-color:/*ac3*/#9e9e9e;
-}
-
-/* Config button */
-#config:hover div{
-	animation-name: spin;
-	animation-duration: 1.5s;
-	animation-iteration-count:infinite;
-}
-#config div{
-	vertical-align:center;
-	margin-top:auto;
-	margin-bottom:auto;
-	display:block;
-	transform-origin:50% 54%;
-	animation-timing-function:linear;
-}
-@keyframes spin {
-	0% {transform:rotate(0deg);}
-	100% {transform:rotate(360deg);}
-}
-
-
-footer{
-	position:absolute;
-	bottom:0;
-	width:100%;
-	margin:0px;
-	overflow:hidden;
-	background-color:/*eg*/#000000;
-	color:/*txt*/#f5f5f5;
-}
-/* Launch button */
-.launch{
-	float:right;
-	padding:5px 15px 5px 15px;
-	margin:5px;
-	font-size:30px;
-	background-color:/*ht*/#628b23;
-	color:/*txt*/#f5f5f5;
-	border-radius:10px;
-}
-.launch span{
-	vertical-align:middle;
-}
-.launch img{
-	height:40px;
-	width:40px;
-	padding:0px;
-	margin:0px 0px 0px 5px;
-	vertical-align:middle;
-}
-.launch:hover span, .launch:hover img{
-	filter:brightness(0.25);
-}
-.launch:hover{
-	background-color:#8fcc33;
-}
-
-
-/* Overlay */
-.overlay {
-	position: fixed;
-	display: none;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0,0,0,0.5);
-	z-index: 2;
-	cursor: pointer;
-}
-.overlay content{
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width:70%;
-	max-width: 600px;
-	color: /*txt*/#f5f5f5;
-	transform: translate(-50%,-50%);
-	background-color:/*bg*/#303030;
-	padding:20px;
-}
-.overlay content h1{
-	margin:auto;
-	font-size: 30px;
-	text-align:center;
-}
-.overlay a{
-	text-align:center;
-	padding:5px 15px 5px 15px;
-	margin:auto;
-	font-size:30px;
-	background-color:/*ht*/#628b23;
-	color:/*txt*/#f5f5f5;
-	border-radius:10px;
-	display:block;
-}
-.overlay select{
-	padding-left:17px;
-	width:80%;
-	padding-top:7px;
-	padding-bottom:7px;
-	padding-right:30px;
-	font-size:20px;
-	color:/*txt*/#f5f5f5;
-	background-color:/*ac2*/#424242;
-	border-radius: 5px;
-	min-width:150px;
-}
-
-
-/* Radio buttons */
-.container {
-	position: relative;
-	padding-left:17px;
-	padding-right:17px;
-	margin-bottom: 17px;
-	cursor: pointer;
-}
-.container input {
-	position: absolute;
-	opacity: 0;
-}
-.checkmark {
-	position: absolute;
-	top: 0;
-	left: 0;
-	height: 15px;
-	width: 15px;
-	background-color: #eee;
-	border-radius: 50%;
-}
-.container:hover input ~ .checkmark {
-	background-color: #ccc;
-}
-.container input:checked ~ .checkmark {
-	background-color: #628b23;
-}
-.checkmark:after {
-	content: "";
-	position: absolute;
-	display: none;
-}
-.container input:checked ~ .checkmark:after {
-	display: block;
-}
-/* Text inputs */
-.text{
-	padding:2px 5px;
-	border:none;
-	border-radius:5px;
-	font-size:16px;
-	width:80%;
-}
-.largeText{
-	padding:2px 5px;
-	border:none;
-	border-radius:5px;
-	font-size:25px;
-	width:80%;
-	display:block;
-	margin: 10px auto 10px auto;
-	text-align:center;
-	background-color: /*txt*/#f5f5f5
-}
-
-
-/* Profile name display */
-.profileName{
-	padding-left:17px;
-	padding-right:7px;
-	width:min-content;
-	padding-top:7px;
-	padding-bottom:7px;
-	margin-left:30px;
-	padding-right:30px;
-	margin:10px;
-	font-size:27px;
-	color:/*txt*/#f5f5f5;
-	background-color:/*ac2*/#424242;
-	border-radius: 5px;
-	min-width:150px;
-}
-.load{
-	padding:5px 15px 5px 15px;
-	margin:5px;
-	font-size:30px;
-	background-color:/*ht*/#628b23;
-	color:/*txt*/#f5f5f5;
-	border-radius:10px;
-}
-
-.selectdiv select {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-}
-
-/* Profile overview */
-.overview{
-	color:/*txt*/#f5f5f5;
-	padding-left:40px;
-}
-
-/* Info panel */
-.panel{
-	display:block;
-	background-color:/*ac2*/#424242;
-	margin-top:30px;
-	padding:0px 10px 30px 10px;
-	border-radius: 10%;
-	color:/*txt*/#f5f5f5;
-	width:40%;
-	max-height: 50%;
-	text-align: center;
-	clear:none;
-	overflow:hidden;
-}
-.panel h1{
-	margin-top:10px;
-	margin-bottom:10px;
-}
-.panel ul{
-	margin:10px;
-	padding:0px;
-	padding-right:0px;
-	margin-right:-15px;
-	list-style: none;
-	overflow-y: auto;
-	text-align: left;
-	max-height: 50%;
-}
-/* Mods info panel */
-#mods{
-	margin-left:30px;
-	float:left;
-}
-/* Saves info panel */
-#saves{
-	margin-right:30px;
-	float:right;
-}
-.panel#saves ul li{
-	font-size: 20px;
-}
-.panel#saves ul li div{
-	font-size:12px;
-	vertical-align: top;
-	padding-left: 15%;
-}
-
-/* Scollbar */
 ::-webkit-scrollbar {
-	width: 20px;
-	margin-right:0px;
-	padding-right:0px;
+    width: 10px;
 }
+
 ::-webkit-scrollbar-track {
-	/* box-shadow: inset 0 0 5px grey; */
+    background: black;
 }
+
 ::-webkit-scrollbar-thumb {
-	background: #9e9e9e;
+    background: #888;
 }
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+search{
+  display:block;
+  float:left;
+  height:100%;
+  background-color:#424242;
+  width:350px;
+}
+
+results{
+  float:none;
+  display:block;
+  height:100%;
+  overflow-y:scroll;
+  overflow-x:scroll;
+}
+
+
+search .input{
+  display:flex;
+  width:95%
+}
+
+search input{
+  border:none;
+  margin:10px 0px 0px 5%;
+  padding:5px 10px;
+  width:75%;
+  font-size:20px;
+  flex: 1;
+}
+
+search .input a{
+  border:none;
+  background-color:#9e9e9e;
+  margin:10px 5% 0px 0px;
+  padding:6px 10px;
+  padding-left:10px;
+  font-size:20px;
+  flex: 0;
+}
+
+.selected{
+  background-color:#9e9e9e !important;
+}
+
+.profile{
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:10px;
+  padding:10px;
+  width:80%;
+  background-color:#212121;
+}
+.profile h2{
+  margin:0px;
+  padding:0px;
+}
+.profile p{
+  margin:5px 0px 0px 0px;
+  padding-left:30px;
+}
+
+content{
+  display:block;
+  height:100%;
+  margin-left:350px;
+  padding:10px 10px 50px 50px;
+  /* background-color:red; */
+}
+
+content header{
+  margin:0px;
+  overflow:hidden;
+  background-color:/*eg*/#212121;
+  width:100%;
+  padding-left:50px;
+  height:80px;
+  min-width:400px;
+  margin-bottom:50px;
+}
+
+content header h1{
+  float:left;
+}
+
+content header div a{
+  float:right;
+  transform:translate(0px, 50%);
+  display:inline-block;
+  margin-right:5%;
+  background-color:limegreen;
+  padding:10px 15px;
+}
+.disabled{
+  opacity:.3;
+  background-color:#424242;
+	cursor:default !important;
+}
+
+.flex{
+  display:flex;
+  flex-flow:row wrap;
+}
+
+article{
+  background-color:#424242;
+  width:30%;
+  padding:10px;
+  margin:10px;
+  display: inline-block;
+  min-width:260px ;
+  flex-grow:1;
+  flex-shrink:1;
+	overflow-y: scroll;
+	max-height: 60%;
+}
+
+article h1{
+  margin:5px 0px 0px 10px;
+}
+article ul{
+  margin-top:5px;
+  list-style:none;
+}
+
+.overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: block; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+.overlay section{
+  padding:15px;
+  padding-bottom:60px;
+  background-color:#424242;
+  width:50%;
+  min-width:350px;
+  max-width:500px;
+  position: relative;
+  top: 30%;
+  transform: translateY(-50%);
+  margin:auto;
+}
+
+.overlay a{
+  margin-right:5%;
+  float:right;
+  background-color:limegreen;
+  padding:10px 15px;
+}
+
+.overlay table{
+  margin-left:5%;
+  font-size:20px;
+}
+
+.overlay input{
+  border:none;
+  padding:5px;
+}
+
+.overlay select{
+  border:none;
+  font-size:17px;
+  padding:1.5px;
+}
+
+#edit{
+  display:block;
+  float:right;
+  transform:translate(5px, -5px) rotate(75deg);
+  color:#212121;
+}
+
+content header h1:hover #edit{
+  color:inherit !important;
+}
+
+.load{
+  float:right;
+  display:inline-block;
+  background-color:limegreen;
+  padding:10px 15px;
+}
+
+.text{
+	border:none;
+	padding:5px;
+	font-size:15px;
+	color:black;
+	width:60%;
+}
+
 #progress{
 	padding-left:10%
 }
@@ -365,7 +306,7 @@ footer{
 	font-size:20px
 }
 
-td{
+#progress td{
 	padding-left:10px;
 }
 
