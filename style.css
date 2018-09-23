@@ -166,6 +166,7 @@ content header div a{
 .disabled{
   opacity:.3;
   background-color:#424242;
+	cursor:default !important;
 }
 
 .flex{
