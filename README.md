@@ -9,32 +9,7 @@ Each profile has it's own:
   
 This allows you to have one set of mods for your career, and a seperate set of mods for your sandbox.
 
-# Installation
-Installation is easy!
-
-Step 1: Get the [newest release](https://github.com/Aree-Vanier/KSP-Profile-Manager/releases)
-
-Step 2: **BACK UP EVERYTHING** While it shouldn't happen, saves and other files may be damaged by the install process
-
-Step 3: Run `KSP-Profile-Manager.exe`
-
-Step 4: Enter the required information on the installation page
-
-![Install page](https://steemitimages.com/0x0/https://cdn.steemitimages.com/DQmeTG5cqBdaDfaCnVYn2kUevefP8LyA46qdDpi4qZt3KHs/image.png "Install page")
-
-Step 5: Wait for the installation process. This may take some time as it has to copy all mods and saves.
-
-Your installation is complete!
-
-# Creating a profile
-To create a profile, click the `New Profile` button in the top left.
-
-Enter a name for the new profile and click continue
-
-Click load to load the new profile
-
-# Selecting a profile
-Select the profile you want to load and click load
+For usage instructions, please refer to the [wiki](https://github.com/Aree-Vanier/KSP-Profile-Manager/wiki)
 
 # Mod conflicts
 There should be no mod conflicts, as no mods run outside of the KSP environment. The profile manager is compatible with CKAN.
