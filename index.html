@@ -163,8 +163,8 @@
 			hideNewProfile();
 		}
 
-  		function  showEditProfile(){
-            document.getElementById("rename").value = document.getElementById("name").innerHTML;
+		function showEditProfile(){
+      document.getElementById("rename").value = document.getElementById("name").innerHTML;
 			document.getElementById("edit_profile").style.display = "block";
 		}
 
@@ -175,6 +175,20 @@
 		function editProfile(){
 			ipcRenderer.send("edit-profile", selected, document.getElementById("rename").value);
 			hideEditProfile();
+		}
+
+		function showEditSettings(){
+			document.getElementById("rename").value = document.getElementById("name").innerHTML;
+			document.getElementById("edit_settings").style.display = "block";
+		}
+
+		function hideEditSettings(){
+			document.getElementById("edit_settings").style.display = "none";
+		}
+
+		function editSettings(){
+			ipcRenderer.send("edit-settings", selected, document.getElementById("rename").value);
+			hideEditSettings();
 		}
 
 
@@ -188,7 +202,7 @@
     <a class="close" id="close" onclick="win_close()">&times;</a>
     <a class="close" id="max" onclick="win_max()">&square;</a>
     <a class="close" id="min" onclick="win_min()">&#95;</a>
-    <a class="close" id="min" onclick="" style="float:left">Setings</a>
+    <a class="close" id="min" onclick="showEditSettings()" style="float:left">Setings</a>
   </header>
 
   <search>
@@ -264,6 +278,28 @@
       <br/>
       <a onclick="editProfile()">Change</a>
       <a style="background-color:red" onclick="hideEditProfile()">Cancel</a>
+    </section>
+  </div>
+  <div class="overlay" id="edit_settings" style="display:none">
+    <section>
+      <h1>Settings</h1>
+      <table style="width:80%">
+        <tr>
+          <td>Path to KSP executable</td>
+        </tr>
+				<tr>
+          <td><input type="text" id="ksp_path" style="width:100%"/></td>
+				</tr>
+        <!-- <tr>
+          <td>Path to CKAN executable</td>
+        </tr>
+				<tr>
+          <td><input type="text" id="ckan_path" style="width:100%"/></td>
+				</tr> -->
+      </table>
+      <br/>
+      <a onclick="editSettings()">Change</a>
+      <a style="background-color:red" onclick="hideEditSettings()">Cancel</a>
     </section>
   </div>
 
