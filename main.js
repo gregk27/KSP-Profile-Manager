@@ -130,7 +130,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  window.toggleDevTools();
+  //window.toggleDevTools();
 });
 
 //IPC window functions
