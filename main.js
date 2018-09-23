@@ -27,8 +27,6 @@ function getDirectories(source, raw){
 
 //Default config
 var config = {
-  "mode":"steam",
-  "version":"64",
   "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
   "loaded":0,
   "profiles":[{"name":"test", "version":"1_4_1"}]
@@ -159,19 +157,16 @@ ipcMain.on('window-close', function(){
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
   data=JSON.parse(data)
-  config = {
-    "mode":data["mode"],
-    "version":data["exe"],
-    "path":data["path"],
-    "profile":{
-      "selected":0,
-      "profiles":[data["profile"]],
-      "versions":[data["version"]]
-    }
-  };
-
-
-  var version = data["version"]
+  config = data;
+  // {
+  //   "CKAN":"",
+  //   "path":data["path"],
+  //   "profile":{
+  //     "selected":0,
+  //     "profiles":[data["profile"]],
+  //     "versions":[data["version"]]
+  //   }
+  // };
 
   console.log(config);
 
@@ -276,11 +271,15 @@ ipcMain.on("window-launch", function(){
   });
 });
 
+ipcMain.on("get-config", function(event, callback){
+  event.sender.send(callback, config)
+});
+
 //Write config data to file
 ipcMain.on("set-config", function(event, arg){
-  config["mode"]=arg["mode"];
-  config["version"]=arg["version"];
   config["path"]=arg["path"];
+  conifg["ckan"]=""
+  saveConfig();
 });
 
 //Send config to renderer
