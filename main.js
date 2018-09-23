@@ -27,15 +27,51 @@ function getDirectories(source, raw){
 
 //Default config
 var config = {
-  "mode":"steam",
-  "version":"64",
   "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
-  "profile":{
-    "selected":0,
-    "profiles":["Test"]
-  }
+  "loaded":0,
+  "profiles":[{"name":"test", "version":"1_4_1"}]
 };
 
+//List of the directories that are profile specific
+var directories = [
+  {
+    "tag":"CKAN",
+    "oldPath":"game\\CKAN",
+    "newPath":"profile\\CKAN",
+    "dependents":[]
+  },
+  {
+    "tag":"Saves",
+    "oldPath":"game\\saves",
+    "newPath":"profile\\saves",
+    "dependents":[]
+  },
+  {
+    "tag":"Ships",
+    "oldPath":"game\\ships",
+    "newPath":"profile\\ships",
+    "dependents":[]
+  },
+  {
+    "tag":"Mods",
+    "oldPath":"game\\GameData",
+    "newPath":"profile\\GameData",
+    "dependents":[
+      {
+        "tag":"Stock",
+        "oldPath":"profile\\GameData\\Squad",
+        "newPath":"stock\\Squad",
+        "dependents":[]
+      },
+      {
+        "tag":"DLC",
+        "oldPath":"profile\\GameData\\SquadExpansion",
+        "newPath":"stock\\SquadExpansion",
+        "dependents":[]
+      }
+    ]
+  }
+]
 
 var path = app.getPath('userData')
 
@@ -43,6 +79,10 @@ console.log(path+"\\config.json");
 
 //Load config
 if(fs.existsSync(path+"\\config.json")){
+  getConfig();
+}
+
+function getConfig(){
   fs.readFile(path+'\\config.json', 'utf-8', function(err, buf) {
     try{
       var data = JSON.parse(buf.toString());
@@ -58,32 +98,8 @@ if(fs.existsSync(path+"\\config.json")){
   });
 }
 
-console.log(config["profile"]["profiles"][config["profile"]["selected"]])
+console.log(config["profiles"][config["loaded"]]["name"])
 
-//Parses ksp save file to JSON
-function parseSFS(path){
-  //Load save file
-  var data = fs.readFileSync(path, "utf-8").replace(/\r/g, "").replace(/\\/g, "\\\\");
-
-  data=('{"'+data+'}')
-  .replace(/(\) *)=( *\()/g, "$1->$2")
-  .replace(/"/g, "'")
-  .replace(/{'([A-Z])/g, '{\"$1')
-  .replace(/ = */g, '": "')
-  .replace(/\n/g, '",\n')
-  .replace(/(\t+)/g, '$1"')
-  .replace(/\n\t{0}([{,},A-Z])/g, '\n"$1')
-  .replace(/^/g, '"')
-  .replace(/"{/g, "{" )
-  .replace(/{"*,*\n/g, "{\n" )
-  .replace(/"}/g, "}" )
-  .replace(/}"/g, "}" )
-  .replace(/},(\n\t*})/g, "}$1")
-  .replace(/,(\n\t*{)/g, ":$1")
-  .replace(/,(\n\t*})/g, "$1");
-
-  return(JSON.parse(data)['GAME'])
-}
 
 //Add commas to seperate thousands
 function commaFormat(num){
@@ -103,7 +119,7 @@ var window;
 
 
 app.on('ready', function(){
-  window = new BrowserWindow({width:640, height:480, frame: false})
+  window = new BrowserWindow({width:1280, height:1024, frame: false})
   //If the config file doesn't exist, run install tool
   if(fs.existsSync(path+'\\config.json'))
     window.loadFile("index.html")
@@ -130,26 +146,27 @@ ipcMain.on('window-max', function (){
 });
 ipcMain.on('window-close', function(){
   console.log("close");
+  window.removeAllListeners('close');
   window.close();
+  sleep.sleep(500, function(){
+    app.quit();
+  })
 });
 
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
   data=JSON.parse(data)
-  config = {
-    "mode":data["mode"],
-    "version":data["exe"],
-    "path":data["path"],
-    "profile":{
-      "selected":0,
-      "profiles":[data["profile"]],
-      "versions":[data["version"]]
-    }
-  };
-
-
-  var version = data["version"]
+  config = data;
+  // {
+  //   "CKAN":"",
+  //   "path":data["path"],
+  //   "profile":{
+  //     "selected":0,
+  //     "profiles":[data["profile"]],
+  //     "versions":[data["version"]]
+  //   }
+  // };
 
   console.log(config);
 
@@ -173,6 +190,7 @@ ipcMain.on('initialize', function(event, data){
 
   var tags = [];
 
+  //Get the tags for the completion indicators
   for(var i = 0; i<folders.length; i++){
     tags.push(folders[i]["tag"]);
     for(var j = 0; j<folders[i]["dependents"].length; j++){
@@ -182,7 +200,7 @@ ipcMain.on('initialize', function(event, data){
 
   event.sender.send("generate-progress-indicators", tags)
 
-
+  //Move the required folders
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
     moveFolder(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], version, event.sender)
@@ -199,32 +217,38 @@ ipcMain.on("finish-init", function(event){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   // location = location.substr(0, location.lastIndexOf("\\"))
 
-  var version = config["profile"]["versions"][config["profile"]["selected"]];
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var version = config["profiles"][config["loaded"]]["version"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   profilePath = profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program"
   console.log("copying")
 
+  //Copy KSP files
   ncp(location, profilePath, function(err){
     console.log("Copied")
+    //Delete old KSP files
     rimraf(location, [], function(){
       console.log("deleted")
+      //Delay to ensure that deletion is complete
       sleep.sleep(1000, function(){
         console.log("linking")
+        //Link the KSP files to the old location
         fs.symlinkSync(profilePath, location, "junction")
-          event.sender.send("complete", "general")
-          console.log("Creating Links")
+        event.sender.send("complete", "general")
+        console.log("Creating Links")
 
-          for(var i = 0; i<folders.length; i++){
-            folder = folders[i];
-            createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
-            for(var j = 0; j<folder["dependents"].length; j++){
-              var subFolder = folder["dependents"][j];
-              createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
-            }
+        //Create the links for the required folders
+        for(var i = 0; i<folders.length; i++){
+          folder = folders[i];
+          createLink(folder["tag"], folder["oldPath"], folder["newPath"], folder["dependents"], event.sender)
+          //Create the links for the subfolders
+          for(var j = 0; j<folder["dependents"].length; j++){
+            var subFolder = folder["dependents"][j];
+            createLink(subFolder["tag"], subFolder["oldPath"], subFolder["newPath"], subFolder["dependents"], event.sender)
           }
+        }
 
-          event.sender.send("complete", "links");
-          console.log("Links finished")
+        event.sender.send("complete", "links");
+        console.log("Links finished")
         //Load main window to complete installation
         event.sender.send("finished-init");
       })
@@ -232,6 +256,7 @@ ipcMain.on("finish-init", function(event){
   })
 })
 
+//Change the page the window is displaying
 ipcMain.on("finished-init", function(){
   window.loadFile("index.html");
 });
@@ -246,11 +271,15 @@ ipcMain.on("window-launch", function(){
   });
 });
 
+ipcMain.on("get-config", function(event, callback){
+  event.sender.send(callback, config)
+});
+
 //Write config data to file
 ipcMain.on("set-config", function(event, arg){
-  config["mode"]=arg["mode"];
-  config["version"]=arg["version"];
   config["path"]=arg["path"];
+  conifg["ckan"]=""
+  saveConfig();
 });
 
 //Send config to renderer
@@ -259,14 +288,15 @@ ipcMain.on("request-config", function(event){
 })
 
 //Send mods to renderer
-ipcMain.on("get-mods", function(event){
-  event.sender.send("get-mods", getDirectories(config["path"].substr(0, config["path"].lastIndexOf("\\"))+"\\GameData", false));
-});
+function getMods(profile){
+  console.log(getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\GameData", false));
+  return getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\GameData", false).split(";");
+};
 
 //Send saves and metadata to renderer
-ipcMain.on("get-saves", function(event){
+function getSaves(profile){
   //Get list of save games
-  var saveDirs = getDirectories(config["path"].substr(0, config["path"].lastIndexOf("\\"))+"\\saves", true);
+  var saveDirs = getDirectories(path+"\\profiles\\"+profile["version"]+"\\"+profile["name"]+"\\saves", true);
 
   var saves = [];
 
@@ -311,23 +341,67 @@ ipcMain.on("get-saves", function(event){
       "reputation":rep,
       "flights":flights
     })
+    console.log("SAVE:")
+    console.log(saves);
   }
   //Send to renderer
-  event.sender.send("get-saves", saves);
-})
+  return saves;
+}
 
+
+function getProfiles(){
+  // Profile Data structure:
+  // {
+  //   "name":"Career",
+  //   "version":"1.4.1",
+  //   "mods":[
+  //     "CKAN",
+  //     "Game Data",
+  //     "Mechjeb",
+  //     "Kerbal engineer redux"
+  //   ],
+  //   "saves"[
+  //     {
+  //       "name":"Save 1",
+  //       "mode":"CAREER",
+  //       "flights":"100",
+  //       "funds":"100",
+  //       "science":"100",
+  //       "reputation":"100"
+  //     }
+  //   ]
+  // }
+  profiles = [];
+  for(var i=0; i<config["profiles"].length; i++){
+    profile = config["profiles"][i];
+    console.log(profile)
+    var out = {
+      "name":profile["name"],
+      "version":profile["version"].replace(/_/g, "."),
+      "mods":null,
+      "saves":null
+    }
+    console.log(out)
+    out.mods = getMods(profile);
+    console.log(out)
+    console.log(getSaves(profile))
+    out.saves = getSaves(profile);
+    console.log(out)
+    profiles.push(out);
+  }
+  return profiles;
+}
 //Send profile data to renderer
 ipcMain.on("get-profiles", function(event){
-  event.sender.send("get-profiles", JSON.stringify(config["profile"]));
+  event.sender.send("get-profiles", getProfiles(), config["loaded"]);
 })
 
 //Create new profile
 ipcMain.on("create-profile", function(event, arg, version){
   //Add profile
-  config["profile"]["profiles"].push(arg)
-  config["profile"]["versions"].push(version)
+  config["profiles"].push({"name":arg, "version":version})
   //Select profile
-  config["profile"]["selected"] = config["profile"]["profiles"].length-1;
+  config["loaded"] = config["profiles"].length-1;
   //Update config save
   saveConfig();
   //Create new folders
@@ -338,8 +412,9 @@ ipcMain.on("create-profile", function(event, arg, version){
   console.log(profilePath);
   fs.mkdirSync(profilePath);
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories
 
+  //Create required folders
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
     var newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
@@ -347,33 +422,34 @@ ipcMain.on("create-profile", function(event, arg, version){
     fs.mkdirSync(newPath);
   }
 
+  //Make symlinks fpr main folders
   fs.symlinkSync(stockPath+"\\Squad", profilePath+"\\GameData\\Squad", "junction");
   fs.symlinkSync(stockPath+"\\SquadExpansion", profilePath+"\\GameData\\SquadExpansion", "junction");
 
   event.sender.send("new-profile-created");
 })
 
+//Counter for completed steps when changing profiles
 changeCount = 0;
 
-//Change location of links
+//Change profiles
 ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
-  var oldVersion = config["profile"]["versions"][config["profile"]["selected"]]
-  config["profile"]["selected"] = config["profile"]["profiles"].indexOf(arg)
+  var oldVersion = config["profiles"][config["loaded"]]["version"];
+  config["loaded"] = arg;
   //Gat path of KSP directory
-  var version = config["profile"]["versions"][config["profile"]["selected"]]
+  var version = config["profiles"][config["loaded"]]["version"]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
-  var profilePath = path+"\\profiles\\"+version+"\\"+arg;
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][arg]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
-
-  console.log(oldVersion+"\t"+version)
-  console.log(location)
   console.log(profilePath)
-  console.log(stockPath)
 
+  //Change versions if needed
   if(version!=oldVersion){
     console.log("change version")
+    //Delete old link
     rimraf(location, [], function(){
+      //Make new link
       fs.symlinkSync(profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program", location, "junction");
       changeProfileRefresh(event.sender)
     })
@@ -381,10 +457,13 @@ ipcMain.on("change-profile", function(event,arg){
   else{
     changeProfileRefresh(event.sender)
   }
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+
+  var folders = directories
 
   for(var i = 0; i<folders.length; i++){
     folder = folders[i];
+
+    //Get paths
     newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
     oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
 
@@ -394,28 +473,29 @@ ipcMain.on("change-profile", function(event,arg){
     }catch(err){
       console.log(err);
     }
-    // sleep.sleep(1000, function(){
-      fs.symlinkSync(newPath, oldPath, 'junction');
-    // })
+    //Make the new links
+    fs.symlinkSync(newPath, oldPath, 'junction');
   }
   changeProfileRefresh(event.sender)
 
 })
 
-
+//Count the completed steps when changing profiles
 function changeProfileRefresh(renderer){
   changeCount++;
   if(changeCount==2)  renderer.send("refresh");
 }
 
 //Renames a profile and associated folders
-ipcMain.on("rename-profile", function(event, oldName, newName){
+ipcMain.on("edit-profile", function(event, index, newName){
+  var oldName = config["profiles"][index]["name"];
+  var version = config["profiles"][index]["version"];
   //Rename in config
-  config["profile"]["profiles"][config["profile"]["profiles"].indexOf(oldName)] = newName;
+  config["profiles"][index]["name"] = newName;
   saveConfig();
   //Rename folder
-  fs.renameSync(path+"\\profiles\\"+oldName, path+"\\profiles\\"+newName);
-  event.sender.send("profile-renamed", newName);
+  fs.renameSync(path+"\\profiles\\"+version+"\\"+oldName, path+"\\profiles\\"+version+"\\"+newName);
+  event.sender.send("refresh");
 })
 
 ipcMain.on("get-versions", function(event){
@@ -435,18 +515,20 @@ function createLink(tag, oldPath, newPath, dependents, renderer){
   //Gat path of KSP directory
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
-  var version = config["profile"]["versions"][config["profile"]["selected"]];
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var version = config["profiles"][config["loaded"]]["version"];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
-
+  //Get the paths
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
   newPath = newPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
 
   try{
+    //Create the link
     fs.symlinkSync(newPath, oldPath, "junction");
     console.log("link complete:"+tag)
   }catch (err){
+    //Report the error
     console.log(tag+" symlink failed")
     renderer.send("failed", "link");
     renderer.send("error", "link-"+tag);
@@ -460,7 +542,7 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
 
   //Get path to profile saves
-  var profilePath = path+"\\profiles\\"+version+"\\"+config["profile"]["profiles"][config["profile"]["selected"]];
+  var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][config["loaded"]]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
 
   oldPath = oldPath.replace("game", location).replace("profile", profilePath).replace("stock", stockPath)

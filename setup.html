@@ -55,12 +55,15 @@
 
 	  var path = document.getElementById("ksp_path").value;
 
+	  var ckan = document.getElementById("ckan_path").value;
+
 	  var profileName = document.getElementById("profile_name").value;
 
     var data = {
 	    "mode":mode,
 	    "exe":version,
 	    "path":path,
+			"ckan":ckan,
 	    "profile":profileName,
 			"version":"1_4_1"
 	  }
@@ -171,8 +174,12 @@
 
 		<!-- Path input/display -->
 		<p>
-			Path:
+			Path to KSP executable:
 			<input type="text" class="text" id="ksp_path" value="C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64.exe" disabled></input>
+		</p>
+		<p>
+			Path to CKAN executable:
+			<input type="text" class="text" id="ckan_path" value="" disabled></input>
 		</p>
 
 		<br/>
