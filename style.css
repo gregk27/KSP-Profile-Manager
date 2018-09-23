@@ -254,3 +254,18 @@ article ul{
 content header h1:hover #edit{
   color:inherit !important;
 }
+
+.load{
+  float:right;
+  display:inline-block;
+  background-color:limegreen;
+  padding:10px 15px;
+}
+
+.text{
+	border:none;
+	padding:5px;
+	font-size:15px;
+	color:black;
+	width:60%;
+}
