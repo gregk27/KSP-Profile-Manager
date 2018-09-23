@@ -156,17 +156,7 @@ ipcMain.on('window-close', function(){
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
-  data=JSON.parse(data)
   config = data;
-  // {
-  //   "CKAN":"",
-  //   "path":data["path"],
-  //   "profile":{
-  //     "selected":0,
-  //     "profiles":[data["profile"]],
-  //     "versions":[data["version"]]
-  //   }
-  // };
 
   console.log(config);
 

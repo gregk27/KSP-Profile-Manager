@@ -132,9 +132,11 @@
 		}
 
 		function load(){
-			console.log("load")
-			loaded = selected;
-			ipcRenderer.send("change-profile", selected)
+			if(loaded == selected){
+				console.log("load")
+				loaded = selected;
+				ipcRenderer.send("change-profile", selected)
+			}
 		}
 
 		ipcRenderer.on("refresh", function(){
@@ -144,7 +146,10 @@
 		})
 
 		function play(){
-
+			if(selected==loaded){
+				// ipcRenderer.send("window-launch");
+				document.getElementById("launch_overlay").style.display="block";
+			}
 		}
 
 		function  showNewProfile(){
@@ -249,6 +254,7 @@
 
   </content>
 
+	<!--Various overlays-->
   <div class="overlay" id="new_profile" style="display:none">
     <section>
       <h1>New Profile</h1>
@@ -305,6 +311,12 @@
       <br/>
       <a onclick="editSettings()">Change</a>
       <a style="background-color:red" onclick="hideEditSettings()">Cancel</a>
+    </section>
+  </div>
+  <div class="overlay" id="launch_overlay" style="display:none">
+    <section>
+      <h1>KSP is Launching</h1>
+      <a onclick="document.getElementById('launch_overlay').style.display='none'">Close</a>
     </section>
   </div>
 
