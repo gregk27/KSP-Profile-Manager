@@ -132,7 +132,8 @@
 		}
 
 		function load(){
-			if(loaded == selected){
+			console.log(selected)
+			if(loaded != selected){
 				console.log("load")
 				loaded = selected;
 				ipcRenderer.send("change-profile", selected)
