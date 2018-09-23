@@ -147,7 +147,7 @@
 
 		function play(){
 			if(selected==loaded){
-				// ipcRenderer.send("window-launch");
+				ipcRenderer.send("window-launch");
 				document.getElementById("launch_overlay").style.display="block";
 			}
 		}
