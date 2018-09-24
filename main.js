@@ -28,6 +28,7 @@ function getDirectories(source, raw){
 //Default config
 var config = {
   "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
+  "CKAN":"",
   "loaded":0,
   "profiles":[{"name":"test", "version":"1_4_1"}]
 };
@@ -255,8 +256,17 @@ ipcMain.on("finished-init", function(){
 //Launch KSP
 ipcMain.on("window-launch", function(){
   console.log("launch");
-  var execFile = require('child_process').execFile, child;
+  let execFile = require('child_process').execFile, child;
   child = execFile(config["path"], function(error,stdout,stderr) {
+    if (error) {
+    }
+  });
+});
+
+ipcMain.on("launch-ckan", function(){
+  console.log("launch");
+  let execFile = require('child_process').execFile, child;
+  child = execFile(config["CKAN"], function(error,stdout,stderr) {
     if (error) {
     }
   });
@@ -269,7 +279,8 @@ ipcMain.on("get-config", function(event, callback){
 //Write config data to file
 ipcMain.on("set-config", function(event, arg){
   config["path"]=arg["path"];
-  conifg["ckan"]=""
+  config["CKAN"]=arg["CKAN"];
+  console.log(arg["CKAN"])
   saveConfig();
 });
 
