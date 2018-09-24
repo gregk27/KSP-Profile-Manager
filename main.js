@@ -130,7 +130,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  window.toggleDevTools();
+  //window.toggleDevTools();
 });
 
 //IPC window functions
@@ -428,12 +428,17 @@ ipcMain.on("change-profile", function(event,arg){
   changeCount = 0;
   var oldVersion = config["profiles"][config["loaded"]]["version"];
   config["loaded"] = arg;
+  saveConfig();
   //Gat path of KSP directory
   var version = config["profiles"][config["loaded"]]["version"]
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
+  var gameLocation = path+"\\profiles\\"+version+"\\Kerbal Space Program";
   var profilePath = path+"\\profiles\\"+version+"\\"+config["profiles"][arg]["name"];
   var stockPath = path+"\\profiles\\"+version+"\\.stock";
   console.log(profilePath)
+  console.log(location)
+  console.log(stockPath)
+  console.log(gameLocation)
 
   //Change versions if needed
   if(version!=oldVersion){
@@ -441,7 +446,7 @@ ipcMain.on("change-profile", function(event,arg){
     //Delete old link
     rimraf(location, [], function(){
       //Make new link
-      fs.symlinkSync(profilePath.substr(0, profilePath.lastIndexOf("\\"))+"\\Kerbal Space Program", location, "junction");
+      fs.symlinkSync(gameLocation, location, "junction");
       changeProfileRefresh(event.sender)
     })
   }
@@ -455,8 +460,8 @@ ipcMain.on("change-profile", function(event,arg){
     folder = folders[i];
 
     //Get paths
-    newPath = folder["newPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath)
-    oldPath = folder["oldPath"].replace("game", location).replace("profile", profilePath).replace("stock", stockPath);
+    newPath = folder["newPath"].replace("profile", profilePath).replace("stock", stockPath).replace("game", gameLocation);
+    oldPath = folder["oldPath"].replace("profile", profilePath).replace("stock", stockPath).replace("game", gameLocation);
 
     //If the folder to be replaced doesn't exist, don't worry
     try{
@@ -465,6 +470,8 @@ ipcMain.on("change-profile", function(event,arg){
       console.log(err);
     }
     //Make the new links
+    console.log(oldPath)
+    console.log(newPath)
     fs.symlinkSync(newPath, oldPath, 'junction');
   }
   changeProfileRefresh(event.sender)
