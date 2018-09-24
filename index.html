@@ -190,7 +190,7 @@
 
 		ipcRenderer.on("set-path", function(e, config){
 			document.getElementById("ksp_path").value = config["path"];
-			// document.getElementById("ckan_path").value = config["CKAN_path"];
+			document.getElementById("ckan_path").value = config["CKAN"];
 		})
 
 		function hideEditSettings(){
@@ -198,8 +198,12 @@
 		}
 
 		function editSettings(){
-			ipcRenderer.send("set-config", {"path": document.getElementById("ksp_path").value});
+			ipcRenderer.send("set-config", {"path": document.getElementById("ksp_path").value, "CKAN": document.getElementById("ckan_path").value});
 			hideEditSettings();
+		}
+
+		function ckan(){
+			ipcRenderer.send("launch-ckan")
 		}
 
 
@@ -214,6 +218,8 @@
     <a class="close" id="max" onclick="win_max()">&square;</a>
     <a class="close" id="min" onclick="win_min()">&#95;</a>
     <a class="close" id="min" onclick="showEditSettings()" style="float:left">Setings</a>
+    <a class="close" id="min" onclick="ckan()" style="float:left">CKAN</a>
+
   </header>
 
   <search>
@@ -302,12 +308,12 @@
 				<tr>
           <td><input type="text" id="ksp_path" style="width:100%"/></td>
 				</tr>
-        <!-- <tr>
+        <tr>
           <td>Path to CKAN executable</td>
         </tr>
 				<tr>
           <td><input type="text" id="ckan_path" style="width:100%"/></td>
-				</tr> -->
+				</tr>
       </table>
       <br/>
       <a onclick="editSettings()">Change</a>
