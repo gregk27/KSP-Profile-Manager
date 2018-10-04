@@ -204,7 +204,7 @@ ipcMain.on('initialize', function(event, data){
 ipcMain.on("finish-init", function(event){
 
 
-  var folders = directories.json;
+  var folders = directories;
 
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   // location = location.substr(0, location.lastIndexOf("\\"))
@@ -227,7 +227,6 @@ ipcMain.on("finish-init", function(event){
         fs.symlinkSync(profilePath, location, "junction")
         event.sender.send("complete", "general")
         console.log("Creating Links")
-
         //Create the links for the required folders
         for(var i = 0; i<folders.length; i++){
           folder = folders[i];
