@@ -158,7 +158,16 @@
 				document.getElementById("new_name").value = document.getElementById("search").value;
 			}
 			document.getElementById("new_profile").style.display = "block";
+			ipcRenderer.send("get-versions");
 		}
+
+		ipcRenderer.on("get-versions", function(e, versions){
+			out = "";
+			for(var i=0; i<versions.length; i++){
+				out+="<option>"+versions[i]+"</option>";
+			}
+			document.getElementById("new_version").innerHTML=out;
+		})
 
 		function hideNewProfile(){
 			document.getElementById("new_profile").style.display = "none";
