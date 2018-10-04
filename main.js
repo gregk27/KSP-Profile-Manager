@@ -178,7 +178,7 @@ ipcMain.on('initialize', function(event, data){
   fs.mkdirSync(stockPath)
   fs.mkdirSync(profilePath)
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories;
 
   var tags = [];
 
@@ -204,7 +204,7 @@ ipcMain.on('initialize', function(event, data){
 ipcMain.on("finish-init", function(event){
 
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories.json;
 
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   // location = location.substr(0, location.lastIndexOf("\\"))
