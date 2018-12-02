@@ -224,9 +224,11 @@ ipcMain.on("finish-init", function(event){
 
   //Copy KSP files
   ncp(location, profilePath, function(err){
+    console.log(err)
     console.log("Copied")
     //Delete old KSP files
-    rimraf(location, [], function(){
+    rimraf(location, [], function(err){
+      console.log(err)
       console.log("deleted")
       //Delay to ensure that deletion is complete
       sleep.sleep(1000, function(){
