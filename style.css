@@ -315,3 +315,12 @@ content header h1:hover #edit{
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
 }
+
+.inline{
+	font-size:15px;
+	padding:5px 6px;
+	margin:0px;
+	float:none;
+	width:50px;
+	text-align:center;
+}

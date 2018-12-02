@@ -131,7 +131,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  //window.toggleDevTools();
+  window.toggleDevTools();
 });
 
 //IPC window functions
@@ -154,12 +154,20 @@ ipcMain.on('window-close', function(){
   })
 });
 
+
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
   config = data;
 
   version = config["profiles"][0]["version"]
+  if(version=="AUTO"){
+    var regex = /[\n\r]Version (\S+)[\n\r]/g;
+    version=regex.exec(fs.readFileSync("C:\\Steam\\steamapps\\common\\Kerbal Space Program\\readme.txt").toString())[1].replace("/./g", "_");
+    console.log(version)
+    config["profiles"][0]["version"] = version;
+  }
+
   console.log(config);
 
   //Save the config
