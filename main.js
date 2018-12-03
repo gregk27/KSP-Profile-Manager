@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require("electron");
+const {app, BrowserWindow, ipcMain, shell} = require("electron");
 const fs = require("fs");
 const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
@@ -604,6 +604,9 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   }
 }
 
+icpMain.on("report", function(){
+	shell.openExternal("https://github.com/Aree-Vanier/KSP-Profile-Manager/issues")
+})
 
 ipcMain.on("uninstall", function(event, output){
   let location = config["path"].substr(0, config["path"].lastIndexOf("\\"));
