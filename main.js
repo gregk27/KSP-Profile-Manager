@@ -604,8 +604,8 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
   }
 }
 
-icpMain.on("report", function(){
-	shell.openExternal("https://github.com/Aree-Vanier/KSP-Profile-Manager/issues")
+ipcMain.on("report", function(){
+	shell.openExternal("https://github.com/Aree-Vanier/KSP-Profile-Manager/issues");
 })
 
 ipcMain.on("uninstall", function(event, output){
