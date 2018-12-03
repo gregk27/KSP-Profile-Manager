@@ -219,6 +219,10 @@
 			ipcRenderer.send("report");
 		}
 
+		function uninstall(){
+			ipcRenderer.send("uninstall", "C:\\Users\\Greg\\Desktop\\Uninstall")
+		}
+
 
 		ipcRenderer.send("get-profiles");
 
@@ -332,6 +336,7 @@
       <br/>
       <a onclick="editSettings()">Change</a>
       <a style="background-color:red" onclick="hideEditSettings()">Cancel</a>
+			<a style="background-color:red; float:left" onclick="uninstall()">&#9888 Uninstall</a>
     </section>
   </div>
   <div class="overlay" id="launch_overlay" style="display:none">

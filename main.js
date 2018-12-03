@@ -131,7 +131,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  //window.toggleDevTools();
+  window.toggleDevTools();
 });
 
 //IPC window functions
@@ -154,12 +154,20 @@ ipcMain.on('window-close', function(){
   })
 });
 
+
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
   config = data;
 
   version = config["profiles"][0]["version"]
+  if(version=="AUTO"){
+    var regex = /[\n\r]Version (\S+)[\n\r]/g;
+    version=regex.exec(fs.readFileSync("C:\\Steam\\steamapps\\common\\Kerbal Space Program\\readme.txt").toString())[1].replace("/./g", "_");
+    console.log(version)
+    config["profiles"][0]["version"] = version;
+  }
+
   console.log(config);
 
   //Save the config
@@ -216,9 +224,11 @@ ipcMain.on("finish-init", function(event){
 
   //Copy KSP files
   ncp(location, profilePath, function(err){
+    console.log(err)
     console.log("Copied")
     //Delete old KSP files
-    rimraf(location, [], function(){
+    rimraf(location, [], function(err){
+      console.log(err)
       console.log("deleted")
       //Delay to ensure that deletion is complete
       sleep.sleep(1000, function(){
@@ -596,4 +606,39 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
 
 icpMain.on("report", function(){
 	shell.openExternal("https://github.com/Aree-Vanier/KSP-Profile-Manager/issues")
+})
+
+ipcMain.on("uninstall", function(event, output){
+  let location = config["path"].substr(0, config["path"].lastIndexOf("\\"));
+  //Delete the main simlink
+  rimraf(location, [], function(){
+    for(let p=0; p<config["profiles"].length; p++){
+      profile = config["profiles"][p];
+      let profilePath = path+"\\profiles\\"+profile["version"]+"\\"+profile["name"];
+      let stockPath = path+"\\profiles\\"+profile["version"]+"\\.stock";
+      let newPath = output+"\\"+profile["name"]+" -- "+profile["version"];
+      let kspPath = path+"\\profiles\\"+profile["version"]+"\\Kerbal Space Program";
+      //Copy KSP files
+      ncp(kspPath, newPath, function(err){
+        console.log(err);
+        console.log("KSP copied")
+        //Copy profile folders
+        ncp(profilePath, newPath, function(err){
+          console.log(err);
+          console.log("Profile copied")
+          //Copy stock folders
+          ncp(stockPath, newPath+"\\GameData", function(err){
+            console.log(err);
+            console.log("Stock copied")
+          })
+          //Delete profile folders
+          rimraf(profilePath, [], function(err){
+            console.log(err);
+            console.log("Profile deleted")
+          })
+        })
+      })
+    }
+    fs.mkdirSync(location);
+  })
 })
