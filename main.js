@@ -603,3 +603,39 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
     })
   }
 }
+
+
+ipcMain.on("uninstall", function(event, output){
+  let location = config["path"].substr(0, config["path"].lastIndexOf("\\"));
+  //Delete the main simlink
+  rimraf(location, [], function(){
+    for(let p=0; p<config["profiles"].length; p++){
+      profile = config["profiles"][p];
+      let profilePath = path+"\\profiles\\"+profile["version"]+"\\"+profile["name"];
+      let stockPath = path+"\\profiles\\"+profile["version"]+"\\.stock";
+      let newPath = output+"\\"+profile["name"]+" -- "+profile["version"];
+      let kspPath = path+"\\profiles\\"+profile["version"]+"\\Kerbal Space Program";
+      //Copy KSP files
+      ncp(kspPath, newPath, function(err){
+        console.log(err);
+        console.log("KSP copied")
+        //Copy profile folders
+        ncp(profilePath, newPath, function(err){
+          console.log(err);
+          console.log("Profile copied")
+          //Copy stock folders
+          ncp(stockPath, newPath+"\\GameData", function(err){
+            console.log(err);
+            console.log("Stock copied")
+          })
+          //Delete profile folders
+          rimraf(profilePath, [], function(err){
+            console.log(err);
+            console.log("Profile deleted")
+          })
+        })
+      })
+    }
+    fs.mkdirSync(location);
+  })
+})
