@@ -214,6 +214,10 @@
 		function ckan(){
 			ipcRenderer.send("launch-ckan")
 		}
+		
+		function report(){
+			ipcRenderer.send("report");
+		}
 
 
 		ipcRenderer.send("get-profiles");
@@ -228,6 +232,7 @@
     <a class="close" id="min" onclick="win_min()">&#95;</a>
     <a class="close" id="min" onclick="showEditSettings()" style="float:left">Settings</a>
     <a class="close" id="min" onclick="ckan()" style="float:left">CKAN</a>
+    <a class="close" id="min" onclick="report()" style="float:right">Report a bug</a>
 
   </header>
 
