@@ -214,13 +214,23 @@
 		function ckan(){
 			ipcRenderer.send("launch-ckan")
 		}
-		
+
 		function report(){
 			ipcRenderer.send("report");
 		}
 
+		function showUninstall(){
+			document.getElementById("uninstall").style.display = "block";
+			document.getElementById("edit_settings").style.display = "none";
+		}
+
+		function hideUninstall(){
+			document.getElementById("uninstall").style.display = "none";
+			document.getElementById("edit_settings").style.display = "block";
+		}
+
 		function uninstall(){
-			ipcRenderer.send("uninstall", "C:\\Users\\Greg\\Desktop\\Uninstall")
+			ipcRenderer.send("uninstall", document.getElementById("uninstall_path"))
 		}
 
 
@@ -336,9 +346,25 @@
       <br/>
       <a onclick="editSettings()">Change</a>
       <a style="background-color:red" onclick="hideEditSettings()">Cancel</a>
-			<a style="background-color:red; float:left" onclick="uninstall()">&#9888 Uninstall</a>
+			<a style="background-color:red; float:left" onclick="showUninstall()">&#9888 Uninstall</a>
     </section>
   </div>
+	<div class="overlay" id="uninstall" style="display:none">
+		<section>
+			<h1>Uninstall</h1>
+			<table style="width:80%">
+				<tr>
+					<td>Path to where files will be placed</td>
+				</tr>
+				<tr>
+					<td><input type="text" id="uninstall_path" style="width:100%"/></td>
+				</tr>
+			</table>
+			<br/>
+			<a onclick="uninstall()" style="background-color:red">Uninstall</a>
+			<a onclick="hideUninstall()">Cancel</a>
+		</section>
+	</div>
   <div class="overlay" id="launch_overlay" style="display:none">
     <section>
       <h1>KSP is Launching</h1>
