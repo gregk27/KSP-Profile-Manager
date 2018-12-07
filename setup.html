@@ -21,6 +21,7 @@
 		}
 	//-----------------------
 
+
 	function submit(){
 
 	  //Get mode
@@ -109,6 +110,20 @@
 		document.getElementById("progress_table").innerHTML = out;
 	})
 
+	function toggleVersion(source, inputID){
+		input = document.getElementById(inputID);
+		if(source.innerHTML=="Manual"){
+			source.innerHTML ="Auto";
+			input.disabled = false;
+			input.value="";
+		}
+		else{
+			source.innerHTML ="Manual";
+			input.disabled = true;
+			input.value="AUTO";
+		}
+	}
+
 </script>
 <body style="color:white">
 	<header>
@@ -138,7 +153,7 @@
 				</tr>
 				<tr style="width:100%">
 					<td>Version:</td>
-					<td><input type="text" class="text" id="profile_version" value="Newest"></input></td>
+					<td><input type="text" class="text" id="profile_version" value="AUTO" disabled></input><a class="inline load" onclick="toggleVersion(this, profile_version)">Manual</a></td>
 				</tr>
 			</table>
 		</div>

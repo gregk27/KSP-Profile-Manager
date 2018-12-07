@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require("electron");
+const {app, BrowserWindow, ipcMain, shell} = require("electron");
 const fs = require("fs");
 const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
@@ -28,6 +28,7 @@ function getDirectories(source, raw){
 //Default config
 var config = {
   "path":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Kerbal Space Program\\KSP_x64.exe",
+  "CKAN":"",
   "loaded":0,
   "profiles":[{"name":"test", "version":"1_4_1"}]
 };
@@ -130,7 +131,7 @@ app.on('ready', function(){
 
 app.on("browser-window-created",function(e,window) {
   window.setMenu(null);
-  //window.toggleDevTools();
+  window.toggleDevTools();
 });
 
 //IPC window functions
@@ -153,12 +154,20 @@ ipcMain.on('window-close', function(){
   })
 });
 
+
 //Initial configuration
 ipcMain.on('initialize', function(event, data){
   //Get config from send data
   config = data;
 
   version = config["profiles"][0]["version"]
+  if(version=="AUTO"){
+    var regex = /[\n\r]Version (\S+)[\n\r]/g;
+    version=regex.exec(fs.readFileSync("C:\\Steam\\steamapps\\common\\Kerbal Space Program\\readme.txt").toString())[1].replace("/./g", "_");
+    console.log(version)
+    config["profiles"][0]["version"] = version;
+  }
+
   console.log(config);
 
   //Save the config
@@ -177,7 +186,7 @@ ipcMain.on('initialize', function(event, data){
   fs.mkdirSync(stockPath)
   fs.mkdirSync(profilePath)
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories;
 
   var tags = [];
 
@@ -203,7 +212,7 @@ ipcMain.on('initialize', function(event, data){
 ipcMain.on("finish-init", function(event){
 
 
-  var folders = JSON.parse(fs.readFileSync("directories.json"))["directories"];
+  var folders = directories;
 
   var location = config["path"].substr(0, config["path"].lastIndexOf("\\"))
   // location = location.substr(0, location.lastIndexOf("\\"))
@@ -215,9 +224,11 @@ ipcMain.on("finish-init", function(event){
 
   //Copy KSP files
   ncp(location, profilePath, function(err){
+    console.log(err)
     console.log("Copied")
     //Delete old KSP files
-    rimraf(location, [], function(){
+    rimraf(location, [], function(err){
+      console.log(err)
       console.log("deleted")
       //Delay to ensure that deletion is complete
       sleep.sleep(1000, function(){
@@ -226,7 +237,6 @@ ipcMain.on("finish-init", function(event){
         fs.symlinkSync(profilePath, location, "junction")
         event.sender.send("complete", "general")
         console.log("Creating Links")
-
         //Create the links for the required folders
         for(var i = 0; i<folders.length; i++){
           folder = folders[i];
@@ -255,8 +265,17 @@ ipcMain.on("finished-init", function(){
 //Launch KSP
 ipcMain.on("window-launch", function(){
   console.log("launch");
-  var execFile = require('child_process').execFile, child;
+  let execFile = require('child_process').execFile, child;
   child = execFile(config["path"], function(error,stdout,stderr) {
+    if (error) {
+    }
+  });
+});
+
+ipcMain.on("launch-ckan", function(){
+  console.log("launch");
+  let execFile = require('child_process').execFile, child;
+  child = execFile(config["CKAN"], function(error,stdout,stderr) {
     if (error) {
     }
   });
@@ -269,7 +288,8 @@ ipcMain.on("get-config", function(event, callback){
 //Write config data to file
 ipcMain.on("set-config", function(event, arg){
   config["path"]=arg["path"];
-  conifg["ckan"]=""
+  config["CKAN"]=arg["CKAN"];
+  console.log(arg["CKAN"])
   saveConfig();
 });
 
@@ -583,3 +603,60 @@ function moveFolder(tag, oldPath, newPath, dependents, version, renderer){
     })
   }
 }
+
+ipcMain.on("report", function(){
+	shell.openExternal("https://github.com/Aree-Vanier/KSP-Profile-Manager/issues");
+})
+
+ipcMain.on("uninstall", function(event, output){
+  let location = config["path"].substr(0, config["path"].lastIndexOf("\\"));
+  let profileCount = config["profiles"].length;
+  //4 steps per profile plus initial step
+  event.sender.send("set-progress", 0, profileCount*6);
+  //Delete the main simlink
+  rimraf(location, [], function(){
+    for(let p=0; p<profileCount; p++){
+      profile = config["profiles"][p];
+      let profilePath = path+"\\profiles\\"+profile["version"]+"\\"+profile["name"];
+      let stockPath = path+"\\profiles\\"+profile["version"]+"\\.stock";
+      let newPath = output+"\\"+profile["name"]+" -- "+profile["version"];
+      let kspPath = path+"\\profiles\\"+profile["version"]+"\\Kerbal Space Program";
+
+      event.sender.send("set-progress", 1,0);
+      rimraf(kspPath+"\\GameData", [], function(){
+        rimraf(kspPath+"\\saves", [], function(){
+          rimraf(kspPath+"\\ships", [], function(){
+            rimraf(kspPath+"\\CKAN", [], function(){
+              event.sender.send("set-progress", 1, 0);
+              //Copy KSP files
+              ncp(kspPath, newPath, function(err){
+                console.log(err);
+                console.log("KSP copied")
+                event.sender.send("set-progress", 1, 0);
+                //Copy profile folders
+                ncp(profilePath, newPath, function(err){
+                  console.log(err);
+                  console.log("Profile copied")
+                  event.sender.send("set-progress", 1, 0);
+                  //Copy stock folders
+                  ncp(stockPath, newPath+"\\GameData", function(err){
+                    console.log(err);
+                    console.log("Stock copied")
+                    event.sender.send("set-progress", 1, 0);
+                  })
+                  //Delete profile folders
+                  rimraf(profilePath, [], function(err){
+                    console.log(err);
+                    console.log("Profile deleted")
+                    event.sender.send("set-progress", 1, 0);
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+    }
+    fs.mkdirSync(location);
+  })
+})

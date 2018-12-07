@@ -158,7 +158,16 @@
 				document.getElementById("new_name").value = document.getElementById("search").value;
 			}
 			document.getElementById("new_profile").style.display = "block";
+			ipcRenderer.send("get-versions");
 		}
+
+		ipcRenderer.on("get-versions", function(e, versions){
+			out = "";
+			for(var i=0; i<versions.length; i++){
+				out+="<option>"+versions[i]+"</option>";
+			}
+			document.getElementById("new_version").innerHTML=out;
+		})
 
 		function hideNewProfile(){
 			document.getElementById("new_profile").style.display = "none";
@@ -190,7 +199,7 @@
 
 		ipcRenderer.on("set-path", function(e, config){
 			document.getElementById("ksp_path").value = config["path"];
-			// document.getElementById("ckan_path").value = config["CKAN_path"];
+			document.getElementById("ckan_path").value = config["CKAN"];
 		})
 
 		function hideEditSettings(){
@@ -198,10 +207,59 @@
 		}
 
 		function editSettings(){
-			ipcRenderer.send("set-config", {"path": document.getElementById("ksp_path").value});
+			ipcRenderer.send("set-config", {"path": document.getElementById("ksp_path").value, "CKAN": document.getElementById("ckan_path").value});
 			hideEditSettings();
 		}
 
+		function ckan(){
+			ipcRenderer.send("launch-ckan")
+		}
+
+		function report(){
+			ipcRenderer.send("report");
+		}
+
+		function showUninstall(){
+			document.getElementById("uninstall").style.display = "block";
+			document.getElementById("edit_settings").style.display = "none";
+		}
+
+		function hideUninstall(){
+			document.getElementById("uninstall").style.display = "none";
+			document.getElementById("edit_settings").style.display = "block";
+		}
+
+		function uninstall(){
+			ipcRenderer.send("uninstall", document.getElementById("uninstall_path").value)
+      document.getElementById("uninstall_1").style.display = "none";
+      document.getElementById("uninstall_2").style.display = "block";
+		}
+
+    ipcRenderer.on("set-progress", function(e, value, max){
+			value *= 100;
+			max *= 100;
+      let bar = document.getElementById("uninstall_progress")
+			let target = 0;
+			console.log("BAR: "+bar.value);
+      if(max == 0){
+        target = bar.value + value;
+      }
+      else{
+        bar.max = max;
+        target = value;
+      }
+      if(bar.value == bar.max){
+        document.getElementById("uninstall_close").style.display = "block";
+				return;
+      }
+
+			let update = setInterval(function() {
+			 if (bar.value >= target) {
+				 clearInterval(update);
+			 }
+			 bar.value++;
+		 	}, 15)
+    })
 
 		ipcRenderer.send("get-profiles");
 
@@ -213,7 +271,10 @@
     <a class="close" id="close" onclick="win_close()">&times;</a>
     <a class="close" id="max" onclick="win_max()">&square;</a>
     <a class="close" id="min" onclick="win_min()">&#95;</a>
-    <a class="close" id="min" onclick="showEditSettings()" style="float:left">Setings</a>
+    <a class="close" id="min" onclick="showEditSettings()" style="float:left">Settings</a>
+    <a class="close" id="min" onclick="ckan()" style="float:left">CKAN</a>
+    <a class="close" id="min" onclick="report()" style="float:right">Report a bug</a>
+
   </header>
 
   <search>
@@ -302,18 +363,48 @@
 				<tr>
           <td><input type="text" id="ksp_path" style="width:100%"/></td>
 				</tr>
-        <!-- <tr>
+        <tr>
           <td>Path to CKAN executable</td>
         </tr>
 				<tr>
           <td><input type="text" id="ckan_path" style="width:100%"/></td>
-				</tr> -->
+				</tr>
       </table>
       <br/>
       <a onclick="editSettings()">Change</a>
       <a style="background-color:red" onclick="hideEditSettings()">Cancel</a>
+			<a style="background-color:red; float:left" onclick="showUninstall()">&#9888 Uninstall</a>
     </section>
   </div>
+	<div class="overlay" id="uninstall" style="display:none">
+		<section id="uninstall_1">
+			<h1>Uninstall</h1>
+			<table style="width:80%">
+				<tr>
+					<td>Path to where files will be placed</td>
+				</tr>
+				<tr>
+					<td><input type="text" id="uninstall_path" style="width:100%"/></td>
+				</tr>
+			</table>
+			<br/>
+			<a onclick="uninstall()" style="background-color:red">Uninstall</a>
+			<a onclick="hideUninstall()">Cancel</a>
+		</section>
+        <section id="uninstall_2" style="display:none">
+			<h1>Uninstall</h1>
+			<table style="width:80%">
+				<tr>
+					<td>Progress</td>
+				</tr>
+				<tr>
+					<td><progress max="10" value="0" id="uninstall_progress"/></td>
+				</tr>
+			</table>
+			<br/>
+			<a id="uninstall_close" onclick="win_close()" style="display:none">Close</a>
+		</section>
+	</div>
   <div class="overlay" id="launch_overlay" style="display:none">
     <section>
       <h1>KSP is Launching</h1>
