@@ -324,3 +324,12 @@ content header h1:hover #edit{
 	width:50px;
 	text-align:center;
 }
+
+progress[value] {
+  -webkit-appearance: none;
+  width:100%;
+}
+
+progress[value]::-webkit-progress-value {
+  background-color:limegreen;
+}
