@@ -1,6 +1,8 @@
 # KSP Profile Manager
 A software utility to simplify the managing of Kerbal Space Program mod profiles.
 
+**NOTE: This is unmaintained, and rather unstable. Be cautions when using**
+
 Each profile has it's own:
   - Saves folder
   - GameData folder
